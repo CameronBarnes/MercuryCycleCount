@@ -11,6 +11,8 @@ import org.junit.platform.commons.util.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -58,7 +60,8 @@ public class FileSystemUtilsTest extends TestCase {
 		assertFalse(outDir.exists());
 		
 		//Test for 4 first, as that's what's expected
-		ArrayList<Bin> bins = generateTestBinData(5);
+		ArrayList<Bin> bins =  DebugUtils.generateTestBinData(5);
+		DebugUtils.generateTestStockStatusFiles(4, Options.PROCESS_FOLDER);
 		
 		SavedOngoing expectedOut = new SavedOngoing(outDir, 0, bins);
 		
@@ -66,6 +69,8 @@ public class FileSystemUtilsTest extends TestCase {
 		System.out.println();
 		FileSystemUtils.saveOngoing(bins, outDir);
 		assertTrue(outDir.exists());
+		// We want to make sure this is actually creating dummy stockstatus files, obviously they're just blank, but we want to make sure they're getting moved here
+		assertTrue(Arrays.stream(Objects.requireNonNull(new File(outDir.getPath() + File.separator + "stockstatus").listFiles())).anyMatch(file -> file.getName().matches("\\w{10}\\.xlsx")));
 		System.out.println("WRITE SavedOngoing 5 PASSED");
 		
 		Optional<SavedOngoing> result = FileSystemUtils.getSavedSessionFromDir(outDir);
@@ -81,7 +86,7 @@ public class FileSystemUtilsTest extends TestCase {
 		System.out.println("FileSystemUtils.deleteDir() Test PASSED");
 		
 		//Test for 10, which would not be an unreasonable number to expect
-		bins = generateTestBinData(10);
+		bins =  DebugUtils.generateTestBinData(10);
 		
 		expectedOut = new SavedOngoing(outDir, 0, bins);
 		
@@ -99,7 +104,7 @@ public class FileSystemUtilsTest extends TestCase {
 		assertFalse(outDir.exists());
 		
 		//Test for 50, which is a lot, but I want to make sure it behaves well at larger data sizes
-		bins = generateTestBinData(50);
+		bins =  DebugUtils.generateTestBinData(50);
 		
 		expectedOut = new SavedOngoing(outDir, 0, bins);
 		
@@ -117,7 +122,7 @@ public class FileSystemUtilsTest extends TestCase {
 		assertFalse(outDir.exists());
 		
 		//Test for 100, which is ridiculous, but if anything is going to fail, it would be this
-		bins = generateTestBinData(100);
+		bins = DebugUtils.generateTestBinData(100);
 		
 		expectedOut = new SavedOngoing(outDir, 0, bins);
 		
@@ -133,63 +138,6 @@ public class FileSystemUtilsTest extends TestCase {
 		//Cleanup
 		FileSystemUtils.deleteDir(outDir);
 		assertFalse(outDir.exists());
-		
-	}
-	
-	private static Part generateTestPartData(String binNum, String warehouse) {
-		
-		Options dummyOptions = new Options();
-		
-		int physQty = ThreadLocalRandom.current().nextInt(1, 101);
-		
-		Part part = new Part(
-				RandomStringUtils.random(20, true, true),
-				RandomStringUtils.random(50, true, false),
-				warehouse,
-				binNum,
-				physQty,
-				0,
-				physQty,
-				ThreadLocalRandom.current().nextDouble(0.01, 200.0)
-				);
-		
-		if (physQty == 1)
-			part.setCountedQuantity(ThreadLocalRandom.current().nextBoolean() ? 1 : 0);
-		else
-			part.setCountedQuantity(ThreadLocalRandom.current().nextInt(0, physQty + 1));
-		
-		if (ThreadLocalRandom.current().nextBoolean())
-			part.autoAdjustment(dummyOptions);
-		
-		return part;
-		
-	}
-	
-	private static ArrayList<Bin> generateTestBinData(int numBins) {
-		
-		ArrayList<Bin> bins = new ArrayList<>();
-		
-		bins.add(new Bin(RandomStringUtils.random(10, true, true), RandomStringUtils.random(10, true, true), new ArrayList<>()));
-		
-		for (int i = 1; i < numBins; i++) {
-			
-			String binNum = RandomStringUtils.random(10, true, true);
-			String warehouse = RandomStringUtils.random(10, true, true);
-			
-			int numParts = ThreadLocalRandom.current().nextInt(5, 200);
-			ArrayList<Part> parts = new ArrayList<>();
-			
-			for (; numParts > 0; numParts--) {
-				
-				parts.add(generateTestPartData(binNum, warehouse));
-				
-			}
-			
-			bins.add(new Bin(binNum, warehouse, parts));
-			
-		}
-		
-		return bins;
 		
 	}
 	

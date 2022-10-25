@@ -9,14 +9,22 @@ import java.awt.event.WindowEvent;
 
 public class Main {
 	
+	public static final Version VERSION = new Version(1, 1, 0, ReleaseType.RELEASE);
+	public static final boolean DEBUG = true;
+	
 	public static void main(String[] args) {
 		
 		FileSystemUtils.createProjectDirs();
 		
 		Options options = FileSystemUtils.readOptions();
+		FileSystemUtils.readVersion().ifPresent(options::setVersion);
 		
 		MainFrame mainFrame = new MainFrame(options);
 		Session session = new Session(mainFrame, options);
+		
+		if (options.setVersion(VERSION)) {
+			mainFrame.showChangeLog();
+		}
 		
 		mainFrame.addWindowListener(new WindowAdapter() {
 			@Override
@@ -51,6 +59,47 @@ public class Main {
 		
 		session.mainMenu();
 	
+	}
+	
+	public enum ReleaseType {
+		ALPHA,
+		BETA,
+		RELEASE
+	}
+	
+	public record Version(int major, int minor, int patch, ReleaseType label) {
+		@Override
+		public String toString() {
+			return major + "_" + minor + "_" + patch + "_" + label.toString();
+		}
+		
+		public String toNiceString() {
+			
+			return major + "." + minor + "." + patch + " " + label.toString();
+			
+		}
+		
+		public int compareTo(Version v) {
+			if (label.compareTo(v.label) > 0) // I think this is the way I want to do this, prefer release versions but only with the newer version
+				return -1;
+			
+			if (v.major > major)
+				return -1;
+			else if (v.major < major)
+				return 1;
+			
+			if (v.minor > minor)
+				return -1;
+			else if (v.minor < minor)
+				return 1;
+			
+			if(v.patch > patch)
+				return -1;
+			else if (v.patch < patch)
+				return 1;
+			
+			return 0;
+		}
 	}
 	
 }

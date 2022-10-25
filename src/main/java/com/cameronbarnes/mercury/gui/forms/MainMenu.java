@@ -1,5 +1,6 @@
 package com.cameronbarnes.mercury.gui.forms;
 
+import com.cameronbarnes.mercury.core.Main;
 import com.cameronbarnes.mercury.core.Session;
 import com.cameronbarnes.mercury.util.FileSystemUtils;
 import com.intellij.uiDesigner.core.GridConstraints;
@@ -30,6 +31,8 @@ public class MainMenu {
 		
 		mResume.setEnabled(FileSystemUtils.hasSavedSessions());
 		mResume.addActionListener(e -> mSession.resume());
+		
+		mVersionText.setText(Main.VERSION.toNiceString());
 		
 	}
 	

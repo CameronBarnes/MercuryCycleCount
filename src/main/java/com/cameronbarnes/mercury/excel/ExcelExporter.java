@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.OptionalInt;
 
 public class ExcelExporter {
@@ -53,6 +54,13 @@ public class ExcelExporter {
 			partDescriptionCharWidth = longestPartDescription.getAsInt() + 5;
 		}
 		
+		boolean hasComments = bin.getParts().stream().anyMatch(Part::hasComments);
+		OptionalInt longestComment = bin.getParts().stream().map(Part::getComments).mapToInt(String::length).max();
+		int partCommentsWidth = 0;
+		if (longestComment.isPresent()) {
+			partCommentsWidth = longestComment.getAsInt() + 5;
+		}
+		
 		// Setup the sheet
 		sheet.setColumnWidth(0, 13 * 256); // PartNumber
 		sheet.setColumnWidth(1, partDescriptionCharWidth * 256); // PartDescription
@@ -62,6 +70,9 @@ public class ExcelExporter {
 		sheet.setColumnWidth(5, 12 * 256); // CountedQty
 		sheet.setColumnWidth(6, 7 * 256);  // Cost
 		sheet.setColumnWidth(7, 12 * 256); // Adjustment
+		if (hasComments) {
+			sheet.setColumnWidth(8, partCommentsWidth * 256); // Part Comments
+		}
 		
 		// Setup the header
 		CellStyle headerStyle = sheet.getWorkbook().createCellStyle();
@@ -108,6 +119,13 @@ public class ExcelExporter {
 		h7.setCellValue("Adjustment");
 		h7.setCellStyle(headerStyle);
 		
+		// We dont need a column for Comment data if there are no comments
+		if (hasComments) {
+			Cell h8 = header.createCell(8, CellType.STRING);
+			h8.setCellValue("Comments");
+			h8.setCellStyle(headerStyle);
+		}
+		
 		if (bin.isEmpty()) { // We're going to display some custom data for this
 			CellStyle noStockStyle = sheet.getWorkbook().createCellStyle();
 			noStockStyle.setBorderBottom(BorderStyle.THIN);
@@ -130,14 +148,14 @@ public class ExcelExporter {
 			for (int i = 0; i < bin.getParts().size(); i++) {
 				
 				Row row = sheet.createRow(i + 1);
-				exportPartToRow(row, bin.getParts().get(i));
+				exportPartToRow(row, bin.getParts().get(i), hasComments);
 				
 			}
 		}
 	
 	}
 	
-	private static void exportPartToRow(Row row, Part part) {
+	private static void exportPartToRow(Row row, Part part, boolean comment) {
 		
 		CellStyle style = row.getSheet().getWorkbook().createCellStyle();
 		style.setBorderBottom(BorderStyle.THIN);
@@ -176,6 +194,12 @@ public class ExcelExporter {
 		Cell h7 = row.createCell(7, CellType.NUMERIC);
 		h7.setCellValue(part.getAdjustment());
 		h7.setCellStyle(style);
+		
+		if (comment) {
+			Cell h8 = row.createCell(8, CellType.STRING);
+			h8.setCellValue(part.getComments());
+			h8.setCellStyle(style);
+		}
 	
 	}
 	

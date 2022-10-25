@@ -46,7 +46,7 @@ public class TextAreaCellEditor extends AbstractCellEditor implements TableCellE
 		
 		Object partNum = table.getValueAt(row, ((CycleCountTableModel) table.getModel()).getColumnIndexAtProperty(Part.PartProperty.PART_NUMBER));
 		if (partNum != null) {
-			mTextAreaDialog.setTitle((String) partNum);
+			mTextAreaDialog.setTitle("Part: " + value + " Comments");
 		}
 		mTextAreaDialog.setText(value == null ? "" : value.toString());
 		return mButton;

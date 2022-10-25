@@ -1,30 +1,45 @@
 package com.cameronbarnes.mercury.gui;
 
+import com.cameronbarnes.mercury.core.Main;
 import com.cameronbarnes.mercury.core.Options;
 import com.cameronbarnes.mercury.core.Session;
+import com.cameronbarnes.mercury.gui.dialogs.DisplayTextPaneDialog;
+import com.cameronbarnes.mercury.gui.dialogs.TextAreaDialog;
 import com.cameronbarnes.mercury.gui.forms.CountForm;
 import com.cameronbarnes.mercury.gui.forms.IngestForm;
 import com.cameronbarnes.mercury.gui.forms.MainMenu;
 import com.cameronbarnes.mercury.gui.forms.ResumeForm;
+import com.cameronbarnes.mercury.util.DebugUtils;
+import com.cameronbarnes.mercury.util.HomeAPIUtils;
 
 import javax.swing.*;
+import java.awt.*;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainFrame extends JFrame {
 	
 	private CountForm mCountForm;
 	private IngestForm mIngestForm;
+	
+	JMenu optionsMenu;
+	
 	public MainFrame(Options options) {
 		
 		this.setSize(1200, 900);
 		this.setLocationRelativeTo(null);
 		this.setEnabled(true);
 		this.setVisible(true);
+		this.setTitle("Mercury Cycle Count");
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		
 		JMenuBar menuBar = new JMenuBar();
 		
-		JMenu optionsMenu = new JMenu();
+		optionsMenu = new JMenu();
 		optionsMenu.setText("Options");
+		
+		JMenu count = new JMenu();
+		count.setText("Count");
 		
 		// By default we dont want people editing the physical part quantity, but we'll leave the option here just in case
 		JCheckBoxMenuItem editPhysicaCount = new JCheckBoxMenuItem("Allow Edit Physical Count");
@@ -41,7 +56,7 @@ public class MainFrame extends JFrame {
 		});
 		editPhysicaCount.setSelected(options.isAllowedWritePhysicalQuantity());
 		
-		optionsMenu.add(editPhysicaCount);
+		count.add(editPhysicaCount);
 		
 		JCheckBoxMenuItem showAllPartsProgress = new JCheckBoxMenuItem("Include All Parts in Progress Bar");
 		showAllPartsProgress.addActionListener(e -> {
@@ -52,7 +67,7 @@ public class MainFrame extends JFrame {
 		});
 		showAllPartsProgress.setSelected(options.shouldShowAllPartsProgress());
 		
-		optionsMenu.add(showAllPartsProgress);
+		count.add(showAllPartsProgress);
 		
 		JCheckBoxMenuItem allowAutoAdjustment = new JCheckBoxMenuItem("Allow Automatic Adjustment");
 		allowAutoAdjustment.addActionListener(e -> {
@@ -61,7 +76,7 @@ public class MainFrame extends JFrame {
 		});
 		allowAutoAdjustment.setSelected(options.isAllowedAutoAdjustment());
 		
-		optionsMenu.add(allowAutoAdjustment);
+		count.add(allowAutoAdjustment);
 		
 		// We'll add check boxes for part details bellow, I think in most cases we wont want to display these, but I'll leave the option here
 		JMenu partDetails = new JMenu();
@@ -109,7 +124,26 @@ public class MainFrame extends JFrame {
 		partDetails.add(free);
 		partDetails.add(comments);
 		
-		optionsMenu.add(partDetails);
+		count.add(partDetails);
+		
+		optionsMenu.add(count);
+		
+		//TODO still need to make the dialog for but reporting and write the API calls for sending that info back to my server
+		JMenu feedback = new JMenu();
+		feedback.setText("Feedback/BugReport");
+		
+		JMenuItem reportBug = new JMenuItem();
+		reportBug.setText("Report Bug");
+		
+		JMenuItem suggestion = new JMenuItem();
+		suggestion.setText("Feature Request");
+		suggestion.addActionListener(e -> {
+			TextAreaDialog dialog = TextAreaDialog.createDialog(this, "Feedback / Feature Request", true);
+			HomeAPIUtils.sendFeedback(dialog.getResult());
+		});
+		
+		feedback.add(reportBug);
+		feedback.add(suggestion);
 		
 		JSpinner fontSize = new JSpinner(new SpinnerNumberModel(options.getFontSize(), 10, 40, 1));
 		fontSize.addChangeListener(e -> {
@@ -122,22 +156,55 @@ public class MainFrame extends JFrame {
 			MainFrame.this.getRootPane().repaint();
 		});
 		
-		optionsMenu.add(new JLabel("Font Size"));
-		optionsMenu.add(fontSize);
+		JMenu font = new JMenu();
+		font.setText("Font");
+		
+		font.add(new JLabel("Font Size"));
+		font.add(fontSize);
+		
+		optionsMenu.add(font);
 		
 		menuBar.add(optionsMenu);
+		menuBar.add(feedback);
 		
 		JMenu help = new JMenu();
 		help.setText("Help");
 		
 		menuBar.add(help);
 		
-		JMenu about = new JMenu();
+		JMenuItem about = new JMenuItem();
 		about.setText("About");
+		about.setHorizontalAlignment(SwingConstants.LEFT);
+		about.setMaximumSize(new Dimension(60, 40));
+		about.addActionListener(e -> {
+			String sb = "Mercury Cycle Count\n\n" +
+								"Created and maintained by Cameron Barnes\n" +
+								"Current version is: " + Main.VERSION.toNiceString() + "\n" +
+								"For bug reports and feature suggestions please use the buttons at the top of the screen.\n" +
+								"For urgent assistance please send an email to cameron_barnes@outlook.com\n";
+			DisplayTextPaneDialog dialog = DisplayTextPaneDialog.createDialog(this, "About", true);
+			dialog.displayText(sb, true);
+		});
 		
 		menuBar.add(about);
 		
 		this.setJMenuBar(menuBar);
+		
+	}
+	
+	public void setDebugDataAction(Session session) {
+		
+		JMenuItem generateDebugData = new JMenuItem();
+		generateDebugData.setText("New Debug Data");
+		generateDebugData.addActionListener(e -> {
+			session.setBins(DebugUtils.generateTestBinData(5));
+			DebugUtils.generateTestStockStatusFiles(4, Options.PROCESS_FOLDER);
+			SwingUtilities.invokeLater(() -> {
+				MainFrame.this.revalidate();
+				MainFrame.this.repaint();
+			});
+		});
+		optionsMenu.add(generateDebugData);
 		
 	}
 	
@@ -189,6 +256,12 @@ public class MainFrame extends JFrame {
 		mCountForm = null;
 		mIngestForm = null;
 		
+	}
+	
+	public void showChangeLog() {
+	
+	
+	
 	}
 	
 }

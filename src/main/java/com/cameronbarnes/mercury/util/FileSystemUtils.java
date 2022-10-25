@@ -1,11 +1,13 @@
 package com.cameronbarnes.mercury.util;
 
+import com.cameronbarnes.mercury.core.Main;
 import com.cameronbarnes.mercury.core.Options;
 import com.cameronbarnes.mercury.core.SavedOngoing;
 import com.cameronbarnes.mercury.stock.Bin;
 import com.cameronbarnes.mercury.stock.Part;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -14,6 +16,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
@@ -47,7 +50,18 @@ public final class FileSystemUtils {
 		
 		Arrays.stream(Objects.requireNonNull(Options.PROCESS_FOLDER.listFiles())).dropWhile(File::isDirectory).forEach(file -> {
 			try {
-				Files.move(file.toPath(), Path.of(Options.IMPORT_FOLDER + File.separator + file.getName()));
+				Path outInIngest = Path.of(Options.IMPORT_FOLDER + File.separator + file.getName());
+				if (outInIngest.toFile().getAbsoluteFile().exists()) {
+					// We're adding a random bit of text to the end of the file name to prevent issues with duplicates
+					String txt = outInIngest.toString();
+					outInIngest = Path.of(
+							txt.substring(0, txt.lastIndexOf(File.separator)) + File.separator
+									+ file.getName().substring(0, file.getName().lastIndexOf("."))
+									+ RandomStringUtils.random(5, true, true)
+									+ "." + getLastSubstring(file.getName(), ".")
+												 );
+				}
+				Files.move(file.toPath(), outInIngest);
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -100,6 +114,7 @@ public final class FileSystemUtils {
 	
 	public static void writeOptions(Options options) {
 		writeOptions(options, new File("options.json"));
+		writeVersion(new File("version.json"));
 	}
 	
 	public static void writeOptions(Options options, File file) {
@@ -121,6 +136,52 @@ public final class FileSystemUtils {
 		catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+		
+	}
+	
+	public static void writeVersion(File file) {
+		
+		try {
+			file.createNewFile();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		try (FileWriter writer = new FileWriter(file)) {
+			
+			Gson gson = new Gson();
+			writer.write(gson.toJson(Main.VERSION));
+			writer.flush();
+			
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public static Optional<Main.Version> readVersion () {
+		return readVersion(new File("version.json"));
+	}
+	
+	public static Optional<Main.Version> readVersion(File file) {
+		
+		try {
+			
+			String value = new String(Files.readAllBytes(Path.of(file.getAbsolutePath())));
+			GsonBuilder builder = new GsonBuilder();
+			builder.registerTypeAdapter(Main.Version.class, new VersionDeserializer());
+			Gson gson = builder.create();
+			return Optional.ofNullable(gson.fromJson(value, Main.Version.class));
+			
+		}
+		catch (NoSuchFileException ignored) {}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return Optional.empty();
 		
 	}
 	
@@ -287,6 +348,15 @@ public final class FileSystemUtils {
 		public BinData deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
 			JsonObject jsonObject = jsonElement.getAsJsonObject();
 			return new BinData(jsonObject.get("BinNumber").getAsString(), jsonObject.get("WareHouse").getAsString(), jsonObject.get("Parts").getAsString());
+		}
+		
+	}
+	
+	private static final class VersionDeserializer implements JsonDeserializer<Main.Version> {
+		@Override
+		public Main.Version deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+			JsonObject jsonObject = json.getAsJsonObject();
+			return new Main.Version(jsonObject.get("major").getAsInt(), jsonObject.get("minor").getAsInt(), jsonObject.get("patch").getAsInt(), Main.ReleaseType.valueOf(jsonObject.get("label").getAsString()));
 		}
 		
 	}

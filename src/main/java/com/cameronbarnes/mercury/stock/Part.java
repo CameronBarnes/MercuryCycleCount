@@ -103,8 +103,12 @@ public class Part {
 		
 	}
 	
+	public boolean hasComments() {
+		return mComments != null && !mComments.isBlank();
+	}
+	
 	public String getComments() {
-		return mComments;
+		return mComments == null ? "" : mComments;
 	}
 	
 	public void setComments(String comments) {

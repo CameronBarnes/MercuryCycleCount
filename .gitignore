@@ -46,3 +46,4 @@ build/
 test_data/
 !/import_stockstatus/
 !/saved_ongoing/
+/version.json

@@ -23,6 +23,10 @@ public class Session {
 	
 	public Session(MainFrame frame, Options options) {
 		mMainFrame = frame;
+		// For debug purposes only
+		if (Main.DEBUG) {
+			mMainFrame.setDebugDataAction(this);
+		}
 		mOptions = options;
 		mIngest = new Ingest(this);
 	}

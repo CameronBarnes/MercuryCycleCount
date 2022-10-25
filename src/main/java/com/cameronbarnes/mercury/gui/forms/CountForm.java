@@ -161,17 +161,18 @@ public class CountForm {
 	}
 	
 	public void submitBINorPartNoToField(String text) {
-	
+		
 		if (text.matches(PN_PATTERN) || text.matches(BIN_NO_PATTERN)) {
 			SwingUtilities.invokeLater(() -> {
 				mScanTextField.setText(text);
 				mScanTextField.postActionEvent();
 			});
 		}
-	
+		
 	}
 	
 	public void changePartsTableLayout() {
+		
 		mCycleCountTableModel.fireTableStructureChanged();
 	}
 	
@@ -246,7 +247,7 @@ public class CountForm {
 		else {
 			mCycleCountTableModel = new CycleCountTableModel(mSession.getBins().get(bin).getParts(), mSession.getUnprotectedOptions(), runnable);
 			mPartsTable.setModel(mCycleCountTableModel);
-			mCurrentBinText.setText(mSession.getBins().get(bin).getBinNum());
+			mCurrentBinText.setText(mSession.getBins().get(bin).getBinNum() + "  |  Number of Parts: " + mSession.getBins().get(bin).getParts().size());
 			mSession.setCurrentBin(bin);
 		}
 		
@@ -313,6 +314,7 @@ public class CountForm {
 		final JSeparator separator1 = new JSeparator();
 		mRightPanel.add(separator1, new GridConstraints(2, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
 		mProgressBar = new JProgressBar();
+		mProgressBar.setStringPainted(true);
 		mRightPanel.add(mProgressBar, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		mScrollPane1 = new JScrollPane();
 		mRightPanel.add(mScrollPane1, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));

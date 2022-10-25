@@ -3,6 +3,7 @@ package com.cameronbarnes.mercury.core;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -13,8 +14,10 @@ public class Options implements IUnprotectedOptions {
 	
 	public static final File SAVED_ONGOING_FOLDER = new File("." + File.separator + "saved_ongoing").getAbsoluteFile();
 	
+	private transient Main.Version mVersion = null;
+	
 	private boolean mIsAllowedWritePhysicalQuantity = false;
-	private boolean mShowAllPartsProgress = true;
+	private boolean mShowAllPartsProgress = false;
 	
 	private boolean mIsAllowedAutoAdjustment = true;
 	
@@ -110,6 +113,9 @@ public class Options implements IUnprotectedOptions {
 		
 		expected.forEach(mShowPartProperties::putIfAbsent);
 		
+		if (mVersion == null)
+			mVersion = Main.VERSION;
+		
 	}
 	
 	public void generateFont() {
@@ -133,6 +139,18 @@ public class Options implements IUnprotectedOptions {
 	@Override
 	public int getFontSize() {
 		return mFontSize;
+	}
+	
+	public boolean setVersion(Main.Version version) {
+	
+		if (mVersion.compareTo(version) < 0) {
+			mVersion = version;
+			return true;
+		}
+		
+		mVersion = version;
+		return false;
+	
 	}
 	
 }
