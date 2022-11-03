@@ -18,7 +18,7 @@ public class HighlightCellRenderer extends DefaultTableCellRenderer {
 	private final Color mHighlightSelectedBadColour;
 	private final Color mHighlightSelectedAdjustedColour;
 	
-	Session mSession;
+	private final Session mSession;
 	
 	public HighlightCellRenderer(Session session) {
 		mHighlightGoodColour = new Color(0, 255, 0, 128);

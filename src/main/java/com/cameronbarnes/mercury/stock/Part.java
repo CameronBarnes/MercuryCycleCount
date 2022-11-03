@@ -1,7 +1,6 @@
 package com.cameronbarnes.mercury.stock;
 
 import com.cameronbarnes.mercury.core.IUnprotectedOptions;
-import com.cameronbarnes.mercury.core.Session;
 
 public class Part {
 	
@@ -57,12 +56,9 @@ public class Part {
 		return mBinNum;
 	}
 	
-	public boolean setPhysicalQuantity(int physicalQuantity, IUnprotectedOptions options) {
+	public void setPhysicalQuantity(int physicalQuantity, IUnprotectedOptions options) {
 		if (options.isAllowedWritePhysicalQuantity()) {
 			mPhysicalQuantity = physicalQuantity;
-			return true;
-		} else {
-			return false;
 		}
 	}
 	
@@ -93,13 +89,12 @@ public class Part {
 	public boolean autoAdjustment(IUnprotectedOptions options) {
 		
 		if (options.isAllowedAutoAdjustment() && mCountedQuantity > 0) {
-			
+			int startAdjust = mAdjustment;
 			mAdjustment = mCountedQuantity - mPhysicalQuantity;
-			return true;
-			
-		} else {
-			return false;
+			return mAdjustment != startAdjust;
 		}
+		
+		return false;
 		
 	}
 	

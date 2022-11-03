@@ -14,8 +14,7 @@ import com.cameronbarnes.mercury.util.HomeAPIUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.ResourceBundle;
 
 public class MainFrame extends JFrame {
 	
@@ -30,23 +29,31 @@ public class MainFrame extends JFrame {
 		this.setLocationRelativeTo(null);
 		this.setEnabled(true);
 		this.setVisible(true);
-		this.setTitle("Mercury Cycle Count");
+		this.setTitle(options.getBundle().getString("title"));
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		
+		this.setJMenuBar(createMenuBar(options));
+		
+	}
+	
+	private JMenuBar createMenuBar(Options options) {
+		
+		ResourceBundle bundle = options.getBundle();
 		
 		JMenuBar menuBar = new JMenuBar();
 		
 		optionsMenu = new JMenu();
-		optionsMenu.setText("Options");
+		optionsMenu.setText(bundle.getString("word_options"));
 		
 		JMenu count = new JMenu();
-		count.setText("Count");
+		count.setText(bundle.getString("word_count"));
 		
-		// By default we dont want people editing the physical part quantity, but we'll leave the option here just in case
-		JCheckBoxMenuItem editPhysicaCount = new JCheckBoxMenuItem("Allow Edit Physical Count");
-		editPhysicaCount.addActionListener(e -> {
-			if (editPhysicaCount.isSelected()) {
-				if (JOptionPane.showConfirmDialog(this.rootPane, "Allow part physical count numbers to be edited?", "Allow Edit Physical Count", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
-					editPhysicaCount.setSelected(false);
+		// By default, we don't want people editing the physical part quantity, but we'll leave the option here just in case
+		JCheckBoxMenuItem editPhysicalCount = new JCheckBoxMenuItem(bundle.getString("menu_bar_allow_edit_physical_count"));
+		editPhysicalCount.addActionListener(e -> {
+			if (editPhysicalCount.isSelected()) {
+				if (JOptionPane.showConfirmDialog(this.rootPane, bundle.getString("menu_bar_allow_edit_physical_count_text"), bundle.getString("menu_bar_allow_edit_physical_count"), JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+					editPhysicalCount.setSelected(false);
 				} else {
 					options.setAllowedWritePhysicalQuantity(true);
 				}
@@ -54,11 +61,11 @@ public class MainFrame extends JFrame {
 				options.setAllowedWritePhysicalQuantity(false);
 			}
 		});
-		editPhysicaCount.setSelected(options.isAllowedWritePhysicalQuantity());
+		editPhysicalCount.setSelected(options.isAllowedWritePhysicalQuantity());
 		
-		count.add(editPhysicaCount);
+		count.add(editPhysicalCount);
 		
-		JCheckBoxMenuItem showAllPartsProgress = new JCheckBoxMenuItem("Include All Parts in Progress Bar");
+		JCheckBoxMenuItem showAllPartsProgress = new JCheckBoxMenuItem(bundle.getString("menu_bar_progress_include_all"));
 		showAllPartsProgress.addActionListener(e -> {
 			options.setShowAllPartsProgress(showAllPartsProgress.isSelected());
 			if (mCountForm != null) {
@@ -69,7 +76,7 @@ public class MainFrame extends JFrame {
 		
 		count.add(showAllPartsProgress);
 		
-		JCheckBoxMenuItem allowAutoAdjustment = new JCheckBoxMenuItem("Allow Automatic Adjustment");
+		JCheckBoxMenuItem allowAutoAdjustment = new JCheckBoxMenuItem(bundle.getString("menu_bar_allow_automatic_adjustment"));
 		allowAutoAdjustment.addActionListener(e -> {
 			options.setAllowedAutoAdjustment(allowAutoAdjustment.isSelected());
 			mCountForm.forceUpdateAdjustment();
@@ -78,9 +85,9 @@ public class MainFrame extends JFrame {
 		
 		count.add(allowAutoAdjustment);
 		
-		// We'll add check boxes for part details bellow, I think in most cases we wont want to display these, but I'll leave the option here
+		// We'll add check boxes for part details bellow, I think in most cases we won't want to display these, but I'll leave the option here
 		JMenu partDetails = new JMenu();
-		partDetails.setText("Part Details");
+		partDetails.setText(bundle.getString("word_part_details"));
 		
 		JCheckBoxMenuItem warehouse = new JCheckBoxMenuItem("WareHouse");
 		warehouse.addActionListener(e -> {
@@ -130,16 +137,17 @@ public class MainFrame extends JFrame {
 		
 		//TODO still need to make the dialog for but reporting and write the API calls for sending that info back to my server
 		JMenu feedback = new JMenu();
-		feedback.setText("Feedback/BugReport");
+		feedback.setText(bundle.getString("menu_bar_feedback"));
 		
 		JMenuItem reportBug = new JMenuItem();
-		reportBug.setText("Report Bug");
+		reportBug.setText(bundle.getString("menu_bar_report_bug"));
 		
 		JMenuItem suggestion = new JMenuItem();
-		suggestion.setText("Feature Request");
+		suggestion.setText(bundle.getString("menu_bar_feature_request"));
 		suggestion.addActionListener(e -> {
-			TextAreaDialog dialog = TextAreaDialog.createDialog(this, "Feedback / Feature Request", true);
-			HomeAPIUtils.sendFeedback(dialog.getResult());
+			TextAreaDialog dialog = TextAreaDialog.createDialog(this, bundle.getString("menu_bar_feature_request_dialog"), true);
+			dialog.setOkButtonText(bundle.getString("word_caps_send"));
+			HomeAPIUtils.sendFeedback(dialog.showAndGetResult());
 		});
 		
 		feedback.add(reportBug);
@@ -157,9 +165,9 @@ public class MainFrame extends JFrame {
 		});
 		
 		JMenu font = new JMenu();
-		font.setText("Font");
+		font.setText(bundle.getString("word_font"));
 		
-		font.add(new JLabel("Font Size"));
+		font.add(new JLabel(bundle.getString("word_font_size")));
 		font.add(fontSize);
 		
 		optionsMenu.add(font);
@@ -168,27 +176,23 @@ public class MainFrame extends JFrame {
 		menuBar.add(feedback);
 		
 		JMenu help = new JMenu();
-		help.setText("Help");
+		help.setText(bundle.getString("word_help"));
 		
 		menuBar.add(help);
 		
 		JMenuItem about = new JMenuItem();
-		about.setText("About");
+		about.setText(bundle.getString("word_about"));
 		about.setHorizontalAlignment(SwingConstants.LEFT);
 		about.setMaximumSize(new Dimension(60, 40));
 		about.addActionListener(e -> {
-			String sb = "Mercury Cycle Count\n\n" +
-								"Created and maintained by Cameron Barnes\n" +
-								"Current version is: " + Main.VERSION.toNiceString() + "\n" +
-								"For bug reports and feature suggestions please use the buttons at the top of the screen.\n" +
-								"For urgent assistance please send an email to cameron_barnes@outlook.com\n";
-			DisplayTextPaneDialog dialog = DisplayTextPaneDialog.createDialog(this, "About", true);
-			dialog.displayText(sb, true);
+			String str = String.format(bundle.getString("about_content"), Main.VERSION.toNiceString());
+			DisplayTextPaneDialog dialog = DisplayTextPaneDialog.createDialog(this, bundle.getString("word_about"), true);
+			dialog.displayText(str, true);
 		});
 		
 		menuBar.add(about);
 		
-		this.setJMenuBar(menuBar);
+		return menuBar;
 		
 	}
 	

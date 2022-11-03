@@ -8,7 +8,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class TextAreaDialog extends JDialog {
+/**
+ * Gets input from the user with a JTextArea in a dialog box
+ */
+public final class TextAreaDialog extends JDialog {
 	
 	private JPanel contentPane;
 	private JButton buttonOK;
@@ -16,6 +19,7 @@ public class TextAreaDialog extends JDialog {
 	private JTextArea mTextArea;
 	private String mResult;
 	
+	// This is private because the static function does the same job but better
 	private TextAreaDialog(JFrame frame, String title, boolean modal) {
 		
 		super(frame, title, modal);
@@ -39,29 +43,52 @@ public class TextAreaDialog extends JDialog {
 		contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 	}
 	
+	/**
+	 * Runs when the ok button is pressed
+	 */
 	private void onOK() {
-		
 		mResult = mTextArea.getText();
 		dispose();
 	}
 	
+	/**
+	 * Runs when either the cancel button is pressed, the window is exited out of, or when the escape button is pressed
+	 */
 	private void onCancel() {
-		
 		dispose();
 	}
 	
+	/**
+	 * Sets the text in the JTextArea
+	 * @param text text to go in the JTextArea
+	 */
 	public void setText(String text) {
-		
 		mTextArea.setText(text);
 		mResult = text;
 	}
 	
+	/**
+	 * @param font the new font for the JTextArea
+	 */
 	public void setAreaFont(Font font) {
-		
 		mTextArea.setFont(font);
 		mTextArea.repaint();
 	}
 	
+	/**
+	 * @param text the new button text for the ok button
+	 */
+	public void setOkButtonText(String text) {
+		buttonOK.setText(text);
+	}
+	
+	/**
+	 * Generates a new TextAreaDialog
+	 * @param frame the source frame
+	 * @param title The title of the new dialog window
+	 * @param modal if this dialog should capture input, that is to say if it should prevent input on the rest of the UI while it is open
+	 * @return a new TextAreaDialog
+	 */
 	public static TextAreaDialog createDialog(JFrame frame, String title, boolean modal) {
 		
 		TextAreaDialog dialog = new TextAreaDialog(frame, title, modal);
@@ -73,11 +100,18 @@ public class TextAreaDialog extends JDialog {
 		
 	}
 	
-	public String getResult() {
-		
+	/**
+	 * Makes the dialog visible and returns the result value
+	 * If the dialog is not modal this will return immediately, which is not ideal, so in that case the separate getResult() function should be called after this
+	 * @return The stored result value
+	 */
+	public String showAndGetResult() {
 		this.setVisible(true);
 		return mResult;
-		
+	}
+	
+	public String getResult() {
+		return mResult;
 	}
 	
 	{

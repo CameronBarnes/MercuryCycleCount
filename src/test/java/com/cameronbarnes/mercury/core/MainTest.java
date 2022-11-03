@@ -1,13 +1,15 @@
 package com.cameronbarnes.mercury.core;
 
-import static org.junit.jupiter.api.Assertions.*;
+import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-class MainTest {
+public class MainTest extends TestCase {
 	
-	public void generalTests() {
+	@Test
+	public void testDebug() {
 		
-		assertFalse(Main.DEBUG);
+		assertFalse(Main.DEBUG); // Debug should be false for any release
 		
 	}
-
+	
 }

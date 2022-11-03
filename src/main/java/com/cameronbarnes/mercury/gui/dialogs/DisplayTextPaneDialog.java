@@ -9,14 +9,19 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
-public class DisplayTextPaneDialog extends JDialog {
+/**
+ * This Dialog exists to display a TextPane and that's basically it
+ */
+public final class DisplayTextPaneDialog extends JDialog {
 	
 	private JPanel contentPane;
 	private JButton buttonOK;
 	private JTextPane mText;
 	
-	public DisplayTextPaneDialog(JFrame frame, String title, boolean modal) {
+	// This is private because the static function does the same job but better
+	private DisplayTextPaneDialog(JFrame frame, String title, boolean modal) {
 		
 		super(frame, title, modal);
 		
@@ -24,25 +29,35 @@ public class DisplayTextPaneDialog extends JDialog {
 		setModal(true);
 		getRootPane().setDefaultButton(buttonOK);
 		
-		buttonOK.addActionListener(e -> onOK());
+		buttonOK.addActionListener(e -> dispose());
+		contentPane.registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		
 	}
 	
-	private void onOK() {
-		// add your code here
-		dispose();
-	}
-	
+	/**
+	 * Generates a new DisplayTextPaneDialog
+	 * @param frame the source frame
+	 * @param title The title of the new dialog window
+	 * @param modal if this dialog should capture input, that is to say if it should prevent input on the rest of the UI while it is open
+	 * @return a new DisplayTextPaneDialog
+	 */
 	public static DisplayTextPaneDialog createDialog(JFrame frame, String title, boolean modal) {
 		
 		DisplayTextPaneDialog dialog = new DisplayTextPaneDialog(frame, title, modal);
+		dialog.setSize(350, 400);
 		dialog.setLocationRelativeTo(frame);
 		dialog.pack();
-		dialog.setSize(300, 400);
+		dialog.setSize(350, 400); // Looks like if I want this to actually center correctly and also be the right size I need to call this twice
 		
 		return dialog;
 		
 	}
 	
+	/**
+	 * Displays text on the dialog and makes it visible
+	 * @param text The text to display
+	 * @param centered if the text should be centered
+	 */
 	public void displayText(String text, boolean centered) {
 		
 		mText.setText(text);

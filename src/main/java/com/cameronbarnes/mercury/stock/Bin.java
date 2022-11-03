@@ -1,6 +1,7 @@
 package com.cameronbarnes.mercury.stock;
 
-import java.util.ArrayList;
+import com.cameronbarnes.mercury.gui.forms.CountForm;
+
 import java.util.List;
 
 public class Bin {
@@ -13,6 +14,8 @@ public class Bin {
 		mParts = parts;
 		mBinNum = binNum;
 		mWarehouse = warehouse;
+		if (!mBinNum.matches(CountForm.BIN_NO_PATTERN))
+			throw new RuntimeException("Invalid Bin Number: " + mBinNum); // TODO handle this with the HomeAPI
 	}
 	
 	public String getBinNum() {

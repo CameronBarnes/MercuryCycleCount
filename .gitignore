@@ -43,7 +43,6 @@ build/
 
 ### Mac OS ###
 .DS_Store!/Cycle Count Fri Oct 21 16-29-35 PDT 2022.xlsx
-test_data/
 !/import_stockstatus/
 !/saved_ongoing/
 /version.json

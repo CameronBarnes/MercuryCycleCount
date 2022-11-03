@@ -10,15 +10,6 @@
     </properties>
     <border type="none"/>
     <children>
-      <component id="87607" class="javax.swing.JButton" binding="mOpenButton">
-        <constraints>
-          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <font size="16"/>
-          <text value="Select Folder"/>
-        </properties>
-      </component>
       <hspacer id="80512">
         <constraints>
           <grid row="0" column="1" row-span="1" col-span="2" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -30,7 +21,7 @@
         </constraints>
         <properties>
           <font size="24"/>
-          <text value="Load Bin Excel Files"/>
+          <text resource-bundle="labels" key="ingest_load_bin_excel_files"/>
         </properties>
       </component>
       <component id="b2554" class="javax.swing.JSeparator">
@@ -50,7 +41,7 @@
         </constraints>
         <properties>
           <font size="14"/>
-          <text value="Place the bin status spreadsheets into the Import folder, click the button to select a folder you'd like to import from, or drag the spreadsheet into this window."/>
+          <text resource-bundle="labels" key="ingest_instructions"/>
         </properties>
       </component>
       <component id="3b83d" class="javax.swing.JButton" binding="mClearButton">
@@ -58,7 +49,7 @@
           <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Remove All"/>
+          <text resource-bundle="labels" key="word_remove_all"/>
         </properties>
       </component>
       <component id="9cf95" class="javax.swing.JButton" binding="mNextButton" default-binding="true">
@@ -66,7 +57,8 @@
           <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Next"/>
+          <font style="1"/>
+          <text resource-bundle="labels" key="word_caps_next"/>
         </properties>
       </component>
       <hspacer id="62bdd">
@@ -92,7 +84,16 @@
           <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Add Empty Bin"/>
+          <text resource-bundle="labels" key="ingest_add_empty_bin"/>
+        </properties>
+      </component>
+      <component id="102ee" class="javax.swing.JButton" binding="mImportFromFolder">
+        <constraints>
+          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font style="1"/>
+          <text value="Select FolderX"/>
         </properties>
       </component>
     </children>

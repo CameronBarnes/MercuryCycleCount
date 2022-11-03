@@ -8,13 +8,13 @@
     <properties/>
     <border type="none"/>
     <children>
-      <component id="3683" class="javax.swing.JLabel">
+      <component id="3683" class="javax.swing.JLabel" binding="mTitle">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <font size="24"/>
-          <text value="Resume Menu"/>
+          <text resource-bundle="labels" key="resume_menu_word"/>
         </properties>
       </component>
       <component id="1e7e5" class="javax.swing.JSeparator">
@@ -34,7 +34,7 @@
           <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Currently Selected: "/>
+          <text resource-bundle="labels" key="currently_selected_word"/>
         </properties>
       </component>
       <component id="f42f4" class="javax.swing.JButton" binding="mResumeButton">
@@ -42,7 +42,7 @@
           <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Resume"/>
+          <text resource-bundle="labels" key="word_resume"/>
         </properties>
       </component>
       <hspacer id="7a6ae">
@@ -55,7 +55,7 @@
           <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Main Menu"/>
+          <text resource-bundle="labels" key="word_main_menu"/>
         </properties>
       </component>
       <component id="108bb" class="javax.swing.JList" binding="mSavedSessionsList">
@@ -71,13 +71,13 @@
           <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
         </constraints>
       </vspacer>
-      <component id="ef054" class="javax.swing.JLabel">
+      <component id="ef054" class="javax.swing.JLabel" binding="mSummary">
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <font size="14"/>
-          <text value="Select a saved session to resume."/>
+          <text resource-bundle="labels" key="resume_menu_instructions"/>
         </properties>
       </component>
     </children>

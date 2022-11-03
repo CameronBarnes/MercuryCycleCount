@@ -1,6 +1,6 @@
 package com.cameronbarnes.mercury.gui.tables.celleditors;
 
-import com.cameronbarnes.mercury.core.Session;
+import com.cameronbarnes.mercury.core.Options;
 import com.cameronbarnes.mercury.gui.dialogs.TextAreaDialog;
 import com.cameronbarnes.mercury.gui.tables.models.CycleCountTableModel;
 import com.cameronbarnes.mercury.stock.Part;
@@ -10,6 +10,7 @@ import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ResourceBundle;
 
 public class TextAreaCellEditor extends AbstractCellEditor implements TableCellEditor, ActionListener {
 	
@@ -36,7 +37,7 @@ public class TextAreaCellEditor extends AbstractCellEditor implements TableCellE
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (EDIT.equals(e.getActionCommand())) {
-			mResults = mTextAreaDialog.getResult();
+			mResults = mTextAreaDialog.showAndGetResult();
 			fireEditingStopped();
 		}
 	}
@@ -44,9 +45,11 @@ public class TextAreaCellEditor extends AbstractCellEditor implements TableCellE
 	@Override
 	public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
 		
+		ResourceBundle bundle = Options.getDefaultBundle();
+		
 		Object partNum = table.getValueAt(row, ((CycleCountTableModel) table.getModel()).getColumnIndexAtProperty(Part.PartProperty.PART_NUMBER));
 		if (partNum != null) {
-			mTextAreaDialog.setTitle("Part: " + value + " Comments");
+			mTextAreaDialog.setTitle(bundle.getString("word_part") + ": " + value + " " + bundle.getString("word_comments"));
 		}
 		mTextAreaDialog.setText(value == null ? "" : value.toString());
 		return mButton;

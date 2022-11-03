@@ -4,7 +4,6 @@ import com.cameronbarnes.mercury.core.IUnprotectedOptions;
 import com.cameronbarnes.mercury.stock.Part;
 
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
 import java.util.*;
 
 public class CycleCountTableModel extends AbstractTableModel {

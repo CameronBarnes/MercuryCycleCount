@@ -2,7 +2,6 @@ package com.cameronbarnes.mercury.gui.forms;
 
 import com.cameronbarnes.mercury.core.SavedOngoing;
 import com.cameronbarnes.mercury.core.Session;
-import com.cameronbarnes.mercury.stock.Bin;
 import com.cameronbarnes.mercury.util.FileSystemUtils;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
@@ -12,21 +11,22 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
 import java.awt.*;
-import java.util.Collection;
-import java.util.Collections;
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class ResumeForm {
 	
 	public JPanel mPanel;
 	private JButton mResumeButton;
 	private JButton mMainMenuButton;
-	private JList<SavedOngoing> mSavedSessionsList;
+	private JList<String> mSavedSessionsList;
 	private JLabel mCurrentlySelectedText;
+	private JLabel mTitle;
+	private JLabel mSummary;
 	
 	private final Session mSession;
-	
-	private final DefaultListModel<SavedOngoing> mListModel;
 	
 	public ResumeForm(Session session) {
 		
@@ -34,17 +34,32 @@ public class ResumeForm {
 		
 		mMainMenuButton.addActionListener(e -> mSession.mainMenu());
 		
-		mListModel = new DefaultListModel<>();
-		FileSystemUtils.getSavedSessions().forEach(mListModel::addElement);
-		mSavedSessionsList.setModel(mListModel);
+		ResourceBundle bundle = session.getUnprotectedOptions().getBundle();
+		
+		DefaultListModel<String> listModel = new DefaultListModel<>();
+		List<SavedOngoing> savedOngoingList = FileSystemUtils.getSavedSessions();
+		savedOngoingList.stream().map(savedOngoing -> savedOngoing.toStringWLocale(bundle)).forEach(listModel::addElement);
+		mSavedSessionsList.setModel(listModel);
+		mSavedSessionsList.addListSelectionListener(e -> mCurrentlySelectedText.setText(bundle.getString("currently_selected_word") + ": " + savedOngoingList.get(mSavedSessionsList.getSelectedIndex())));
 		mSavedSessionsList.setSelectedIndex(0);
 		
 		mResumeButton.addActionListener(e -> {
-			SavedOngoing savedSession = mListModel.get(mSavedSessionsList.getSelectedIndex());
+			SavedOngoing savedSession = savedOngoingList.get(mSavedSessionsList.getSelectedIndex());
 			FileSystemUtils.moveFilesFromSavedSession(savedSession);
 			mSession.setBins(savedSession.getBins());
 			mSession.count();
 		});
+		
+		updateUILang(bundle);
+		
+	}
+	
+	private void updateUILang(ResourceBundle bundle) {
+		
+		mTitle.setText(bundle.getString("resume_form_title"));
+		mResumeButton.setText(bundle.getString("word_resume"));
+		mMainMenuButton.setText(bundle.getString("main_menu_word_caps"));
+		mSummary.setText(bundle.getString("resume_form_summary"));
 		
 	}
 	
@@ -66,35 +81,35 @@ public class ResumeForm {
 		
 		mPanel = new JPanel();
 		mPanel.setLayout(new GridLayoutManager(6, 4, new Insets(0, 0, 0, 0), -1, -1));
-		final JLabel label1 = new JLabel();
-		Font label1Font = this.$$$getFont$$$(null, -1, 24, label1.getFont());
-		if (label1Font != null) label1.setFont(label1Font);
-		label1.setText("Resume Menu");
-		mPanel.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		mTitle = new JLabel();
+		Font mTitleFont = this.$$$getFont$$$(null, -1, 24, mTitle.getFont());
+		if (mTitleFont != null) mTitle.setFont(mTitleFont);
+		this.$$$loadLabelText$$$(mTitle, this.$$$getMessageFromBundle$$$("labels", "resume_menu_word"));
+		mPanel.add(mTitle, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		final JSeparator separator1 = new JSeparator();
 		mPanel.add(separator1, new GridConstraints(2, 0, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
 		final JSeparator separator2 = new JSeparator();
 		mPanel.add(separator2, new GridConstraints(4, 0, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
 		mCurrentlySelectedText = new JLabel();
-		mCurrentlySelectedText.setText("Currently Selected: ");
+		this.$$$loadLabelText$$$(mCurrentlySelectedText, this.$$$getMessageFromBundle$$$("labels", "currently_selected_word"));
 		mPanel.add(mCurrentlySelectedText, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		mResumeButton = new JButton();
-		mResumeButton.setText("Resume");
+		this.$$$loadButtonText$$$(mResumeButton, this.$$$getMessageFromBundle$$$("labels", "word_resume"));
 		mPanel.add(mResumeButton, new GridConstraints(5, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		final Spacer spacer1 = new Spacer();
 		mPanel.add(spacer1, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
 		mMainMenuButton = new JButton();
-		mMainMenuButton.setText("Main Menu");
+		this.$$$loadButtonText$$$(mMainMenuButton, this.$$$getMessageFromBundle$$$("labels", "word_main_menu"));
 		mPanel.add(mMainMenuButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		mSavedSessionsList = new JList();
 		mPanel.add(mSavedSessionsList, new GridConstraints(3, 0, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
 		final Spacer spacer2 = new Spacer();
 		mPanel.add(spacer2, new GridConstraints(3, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-		final JLabel label2 = new JLabel();
-		Font label2Font = this.$$$getFont$$$(null, -1, 14, label2.getFont());
-		if (label2Font != null) label2.setFont(label2Font);
-		label2.setText("Select a saved session to resume.");
-		mPanel.add(label2, new GridConstraints(1, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		mSummary = new JLabel();
+		Font mSummaryFont = this.$$$getFont$$$(null, -1, 14, mSummary.getFont());
+		if (mSummaryFont != null) mSummary.setFont(mSummaryFont);
+		this.$$$loadLabelText$$$(mSummary, this.$$$getMessageFromBundle$$$("labels", "resume_menu_instructions"));
+		mPanel.add(mSummary, new GridConstraints(1, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 	}
 	
 	/**
@@ -120,6 +135,81 @@ public class ResumeForm {
 		boolean isMac = System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).startsWith("mac");
 		Font fontWithFallback = isMac ? new Font(font.getFamily(), font.getStyle(), font.getSize()) : new StyleContext().getFont(font.getFamily(), font.getStyle(), font.getSize());
 		return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
+	}
+	
+	private static Method $$$cachedGetBundleMethod$$$ = null;
+	
+	private String $$$getMessageFromBundle$$$(String path, String key) {
+		
+		ResourceBundle bundle;
+		try {
+			Class<?> thisClass = this.getClass();
+			if ($$$cachedGetBundleMethod$$$ == null) {
+				Class<?> dynamicBundleClass = thisClass.getClassLoader().loadClass("com.intellij.DynamicBundle");
+				$$$cachedGetBundleMethod$$$ = dynamicBundleClass.getMethod("getBundle", String.class, Class.class);
+			}
+			bundle = (ResourceBundle) $$$cachedGetBundleMethod$$$.invoke(null, path, thisClass);
+		}
+		catch (Exception e) {
+			bundle = ResourceBundle.getBundle(path);
+		}
+		return bundle.getString(key);
+	}
+	
+	/**
+	 * @noinspection ALL
+	 */
+	private void $$$loadLabelText$$$(JLabel component, String text) {
+		
+		StringBuffer result = new StringBuffer();
+		boolean haveMnemonic = false;
+		char mnemonic = '\0';
+		int mnemonicIndex = -1;
+		for (int i = 0; i < text.length(); i++) {
+			if (text.charAt(i) == '&') {
+				i++;
+				if (i == text.length()) break;
+				if (!haveMnemonic && text.charAt(i) != '&') {
+					haveMnemonic = true;
+					mnemonic = text.charAt(i);
+					mnemonicIndex = result.length();
+				}
+			}
+			result.append(text.charAt(i));
+		}
+		component.setText(result.toString());
+		if (haveMnemonic) {
+			component.setDisplayedMnemonic(mnemonic);
+			component.setDisplayedMnemonicIndex(mnemonicIndex);
+		}
+	}
+	
+	/**
+	 * @noinspection ALL
+	 */
+	private void $$$loadButtonText$$$(AbstractButton component, String text) {
+		
+		StringBuffer result = new StringBuffer();
+		boolean haveMnemonic = false;
+		char mnemonic = '\0';
+		int mnemonicIndex = -1;
+		for (int i = 0; i < text.length(); i++) {
+			if (text.charAt(i) == '&') {
+				i++;
+				if (i == text.length()) break;
+				if (!haveMnemonic && text.charAt(i) != '&') {
+					haveMnemonic = true;
+					mnemonic = text.charAt(i);
+					mnemonicIndex = result.length();
+				}
+			}
+			result.append(text.charAt(i));
+		}
+		component.setText(result.toString());
+		if (haveMnemonic) {
+			component.setMnemonic(mnemonic);
+			component.setDisplayedMnemonicIndex(mnemonicIndex);
+		}
 	}
 	
 	/**

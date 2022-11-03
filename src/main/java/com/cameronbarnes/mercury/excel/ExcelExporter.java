@@ -2,6 +2,7 @@ package com.cameronbarnes.mercury.excel;
 
 import com.cameronbarnes.mercury.stock.Bin;
 import com.cameronbarnes.mercury.stock.Part;
+import com.cameronbarnes.mercury.util.HomeAPIUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -11,14 +12,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.OptionalInt;
 
-public class ExcelExporter {
+public final class ExcelExporter {
 	
+	/**
+	 * Exports the count to an output Excel file
+	 * @param bins the bins to export
+	 * @param out the file to write to
+	 * @return if the operation was successful
+	 */
 	public static boolean exportCycleCount(List<Bin> bins, File out) {
 		
-		if (bins == null || bins.isEmpty())
+		if (bins == null || bins.isEmpty() || bins.stream().allMatch(Bin::isEmpty))
 			return false;
 		
 		try (Workbook workbook = new XSSFWorkbook()) {
@@ -29,25 +35,28 @@ public class ExcelExporter {
 			}
 			
 			try (FileOutputStream outputStream = new FileOutputStream(out)) {
-				
 				workbook.write(outputStream);
-				
 			}
 		
-		} catch (IOException e) {
-			System.err.println("Debug: Exception in Excel CycleCount Exporter. Exception text is as follows");
-			e.printStackTrace();
+		} catch (Exception e) {
+			// If this throws an exception I as a developer probably want to know about it, so I'm going to prompt the user to send the information to me
+			HomeAPIUtils.handleExcelExporterError(e, out, bins);
 			return false;
 		}
 		
 		return true;
-	
+		
 	}
 	
+	/**
+	 * Each bin in the output spreadsheet should be on its own sheet, this function fills the sheet for that bin with the relevant data
+	 * @param sheet the sheet to write to
+	 * @param bin the bin to output to the sheet
+	 */
 	private static void exportBinToSheet(Sheet sheet, Bin bin) {
 		
 		OptionalInt longestPartDescription = bin.getParts().stream().map(Part::getPartDescription).mapToInt(String::length).max(); // Get the length of the longest part description in this bin
-		int partDescriptionCharWidth = 35; // This is the default value, though I doubt it'll ever get used at this point
+		int partDescriptionCharWidth; // This is the default value, though I doubt it'll ever get used at this point
 		if (longestPartDescription.isEmpty() || longestPartDescription.getAsInt() <  15) {
 			partDescriptionCharWidth = 18;
 		} else {
@@ -61,7 +70,7 @@ public class ExcelExporter {
 			partCommentsWidth = longestComment.getAsInt() + 5;
 		}
 		
-		// Setup the sheet
+		// Set up the sheet
 		sheet.setColumnWidth(0, 13 * 256); // PartNumber
 		sheet.setColumnWidth(1, partDescriptionCharWidth * 256); // PartDescription
 		sheet.setColumnWidth(2, 15 * 256); // WareHouse
@@ -74,7 +83,7 @@ public class ExcelExporter {
 			sheet.setColumnWidth(8, partCommentsWidth * 256); // Part Comments
 		}
 		
-		// Setup the header
+		// Set up the header
 		CellStyle headerStyle = sheet.getWorkbook().createCellStyle();
 		headerStyle.setBorderBottom(BorderStyle.THIN);
 		headerStyle.setBorderLeft(BorderStyle.THIN);
@@ -119,7 +128,7 @@ public class ExcelExporter {
 		h7.setCellValue("Adjustment");
 		h7.setCellStyle(headerStyle);
 		
-		// We dont need a column for Comment data if there are no comments
+		// We don't need a column for Comment data if there are no comments
 		if (hasComments) {
 			Cell h8 = header.createCell(8, CellType.STRING);
 			h8.setCellValue("Comments");
@@ -155,6 +164,12 @@ public class ExcelExporter {
 	
 	}
 	
+	/**
+	 * Each part in the bin should be displayed on a separate row in the sheet, this function fills that row with data from the part
+	 * @param row the row to output data to
+	 * @param part the part to output data from
+	 * @param comment if any part in this bin has a comment, as if it does the comment column needs to have a border drawn for the cell even if it's empty
+	 */
 	private static void exportPartToRow(Row row, Part part, boolean comment) {
 		
 		CellStyle style = row.getSheet().getWorkbook().createCellStyle();

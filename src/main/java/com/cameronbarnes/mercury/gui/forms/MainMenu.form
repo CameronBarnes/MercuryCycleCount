@@ -23,7 +23,7 @@
         </constraints>
         <properties>
           <font size="20"/>
-          <text value="Cycle Count"/>
+          <text resource-bundle="labels" key="cycle_count_word"/>
         </properties>
       </component>
       <vspacer id="88e3">
@@ -44,7 +44,7 @@
           <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Start"/>
+          <text resource-bundle="labels" key="word_start"/>
         </properties>
       </component>
       <hspacer id="36d8e">
@@ -84,7 +84,7 @@
         </constraints>
         <properties>
           <enabled value="false"/>
-          <text value="Resume"/>
+          <text resource-bundle="labels" key="word_resume"/>
         </properties>
       </component>
     </children>

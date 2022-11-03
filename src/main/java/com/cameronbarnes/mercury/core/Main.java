@@ -6,18 +6,21 @@ import com.cameronbarnes.mercury.util.FileSystemUtils;
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ResourceBundle;
 
 public class Main {
 	
-	public static final Version VERSION = new Version(1, 1, 0, ReleaseType.RELEASE);
-	public static final boolean DEBUG = true;
+	public static final Version VERSION = new Version(1, 2, 0, ReleaseType.BETA);
+	public static final boolean DEBUG = false;
 	
 	public static void main(String[] args) {
 		
 		FileSystemUtils.createProjectDirs();
 		
 		Options options = FileSystemUtils.readOptions();
-		FileSystemUtils.readVersion().ifPresent(options::setVersion);
+		if (options.setVersion(VERSION)) {
+			// TODO handle showing changelogs
+		}
 		
 		MainFrame mainFrame = new MainFrame(options);
 		Session session = new Session(mainFrame, options);
@@ -26,17 +29,19 @@ public class Main {
 			mainFrame.showChangeLog();
 		}
 		
+		final ResourceBundle bundle = options.getBundle();
+		
 		mainFrame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				super.windowClosing(e);
 				
 				if (mainFrame.isCount() && !session.getBins().isEmpty()) {
-					String[] choices = new String[]{"Save", "Don't Save"};
+					String[] choices = new String[]{bundle.getString("word_save"), bundle.getString("word_dont_save")};
 					int choice = JOptionPane.showOptionDialog(
 							mainFrame.getRootPane(),
-							"Save your work to resume later?",
-							"Save?",
+							bundle.getString("question_save_work"),
+							bundle.getString("query_save"),
 							JOptionPane.DEFAULT_OPTION,
 							JOptionPane.WARNING_MESSAGE,
 							null,
@@ -61,12 +66,22 @@ public class Main {
 	
 	}
 	
+	/**
+	 * The Release Type, RELEASE for full releases, ALPHA or BETA for development versions
+	 */
 	public enum ReleaseType {
 		ALPHA,
 		BETA,
 		RELEASE
 	}
 	
+	/**
+	 *
+	 * @param major The major version number
+	 * @param minor The minor version number
+	 * @param patch The patch version number
+	 * @param label The release type, RELEASE for full releases, ALPHA or BETA for development versions
+	 */
 	public record Version(int major, int minor, int patch, ReleaseType label) {
 		@Override
 		public String toString() {
@@ -80,8 +95,6 @@ public class Main {
 		}
 		
 		public int compareTo(Version v) {
-			if (label.compareTo(v.label) > 0) // I think this is the way I want to do this, prefer release versions but only with the newer version
-				return -1;
 			
 			if (v.major > major)
 				return -1;
@@ -100,6 +113,17 @@ public class Main {
 			
 			return 0;
 		}
+		
+		@Override
+		public boolean equals(Object o) {
+			
+			if (!(o instanceof Version version))
+				return false;
+			
+			return this.compareTo(version) == 0;
+			
+		}
+		
 	}
 	
 }

@@ -5,24 +5,30 @@ import com.cameronbarnes.mercury.stock.Bin;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
-public class SavedOngoing {
+public final class SavedOngoing {
 	
 	private final File mSaveDir;
-	private int mNumFiles = 0;
 	private final ArrayList<Bin> mBins;
 	
-	public SavedOngoing(File saveDir, int numFiles, ArrayList<Bin> bins) {
+	/**
+	 * This class handles holding the data for saving ongoing cycle count progress to disk and reading it from the disk.
+	 * The actual read and write functions are handled by FileSystemUtils but the data is stored here
+	 * @param saveDir The directory to save to or load from
+	 * @param bins the bins to save or the bins loaded from the disk
+	 */
+	public SavedOngoing(File saveDir, ArrayList<Bin> bins) {
 		
 		mSaveDir = saveDir;
-		mNumFiles = numFiles;
 		mBins = bins;
 		
 	}
 	
-	public int getNumFiles() {
-		return mNumFiles;
+	public int getNumStockStatusFiles() {
+		return (int) Arrays.stream(Objects.requireNonNull(new File(mSaveDir.getAbsolutePath() + File.separator + "stockstatus").listFiles())).dropWhile(File::isDirectory).count();
 	}
 	
 	public ArrayList<Bin> getBins() {
@@ -33,6 +39,10 @@ public class SavedOngoing {
 		return mSaveDir;
 	}
 	
+	/**
+	 *
+	 * @return the bin number of each bin separated by a space
+	 */
 	private String getBinsStr() {
 		
 		StringBuilder sb = new StringBuilder();
@@ -43,7 +53,11 @@ public class SavedOngoing {
 	
 	@Override
 	public String toString() {
-		return "Date: " + mSaveDir.getName() + ". Num StockStatus Files: " + mNumFiles + ". Bins: " + getBinsStr();
+		return "Date: " + mSaveDir.getName() + ". Num StockStatus Files: " + getNumStockStatusFiles() + ". Bins: " + getBinsStr();
+	}
+	
+	public String toStringWLocale(ResourceBundle bundle) {
+		return bundle.getString("word_date") + ": " + mSaveDir.getName() + ". " + bundle.getString("saved_ongoing_text1") + ": " + getNumStockStatusFiles() + ". " + bundle.getString("word_bins") + ": " + getBinsStr();
 	}
 	
 	@Override
@@ -60,7 +74,7 @@ public class SavedOngoing {
 			return false;
 		}
 		
-		if (mNumFiles != s.mNumFiles)
+		if (getNumStockStatusFiles() != s.getNumStockStatusFiles())
 			return false;
 		
 		return mBins.stream().allMatch(bin -> s.mBins.stream().anyMatch(bin2 -> bin2.equals(bin)));

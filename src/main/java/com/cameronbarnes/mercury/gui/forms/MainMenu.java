@@ -11,7 +11,9 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
 import java.awt.*;
+import java.lang.reflect.Method;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class MainMenu {
 	
@@ -32,7 +34,7 @@ public class MainMenu {
 		mResume.setEnabled(FileSystemUtils.hasSavedSessions());
 		mResume.addActionListener(e -> mSession.resume());
 		
-		mVersionText.setText(Main.VERSION.toNiceString());
+		mVersionText.setText(mSession.getUnprotectedOptions().getBundle().getString("word_version") + ": " + Main.VERSION.toNiceString());
 		
 	}
 	
@@ -62,14 +64,14 @@ public class MainMenu {
 		mTitlePart2 = new JLabel();
 		Font mTitlePart2Font = this.$$$getFont$$$(null, -1, 20, mTitlePart2.getFont());
 		if (mTitlePart2Font != null) mTitlePart2.setFont(mTitlePart2Font);
-		mTitlePart2.setText("Cycle Count");
+		this.$$$loadLabelText$$$(mTitlePart2, this.$$$getMessageFromBundle$$$("labels", "cycle_count_word"));
 		mPanel.add(mTitlePart2, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		final Spacer spacer1 = new Spacer();
 		mPanel.add(spacer1, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(-1, 50), new Dimension(-1, 50), 0, false));
 		final Spacer spacer2 = new Spacer();
 		mPanel.add(spacer2, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
 		mStart = new JButton();
-		mStart.setText("Start");
+		this.$$$loadButtonText$$$(mStart, this.$$$getMessageFromBundle$$$("labels", "word_start"));
 		mPanel.add(mStart, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		final Spacer spacer3 = new Spacer();
 		mPanel.add(spacer3, new GridConstraints(4, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
@@ -85,7 +87,7 @@ public class MainMenu {
 		mPanel.add(mAuthorText, new GridConstraints(7, 2, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		mResume = new JButton();
 		mResume.setEnabled(false);
-		mResume.setText("Resume");
+		this.$$$loadButtonText$$$(mResume, this.$$$getMessageFromBundle$$$("labels", "word_resume"));
 		mPanel.add(mResume, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 	}
 	
@@ -112,6 +114,81 @@ public class MainMenu {
 		boolean isMac = System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).startsWith("mac");
 		Font fontWithFallback = isMac ? new Font(font.getFamily(), font.getStyle(), font.getSize()) : new StyleContext().getFont(font.getFamily(), font.getStyle(), font.getSize());
 		return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
+	}
+	
+	private static Method $$$cachedGetBundleMethod$$$ = null;
+	
+	private String $$$getMessageFromBundle$$$(String path, String key) {
+		
+		ResourceBundle bundle;
+		try {
+			Class<?> thisClass = this.getClass();
+			if ($$$cachedGetBundleMethod$$$ == null) {
+				Class<?> dynamicBundleClass = thisClass.getClassLoader().loadClass("com.intellij.DynamicBundle");
+				$$$cachedGetBundleMethod$$$ = dynamicBundleClass.getMethod("getBundle", String.class, Class.class);
+			}
+			bundle = (ResourceBundle) $$$cachedGetBundleMethod$$$.invoke(null, path, thisClass);
+		}
+		catch (Exception e) {
+			bundle = ResourceBundle.getBundle(path);
+		}
+		return bundle.getString(key);
+	}
+	
+	/**
+	 * @noinspection ALL
+	 */
+	private void $$$loadLabelText$$$(JLabel component, String text) {
+		
+		StringBuffer result = new StringBuffer();
+		boolean haveMnemonic = false;
+		char mnemonic = '\0';
+		int mnemonicIndex = -1;
+		for (int i = 0; i < text.length(); i++) {
+			if (text.charAt(i) == '&') {
+				i++;
+				if (i == text.length()) break;
+				if (!haveMnemonic && text.charAt(i) != '&') {
+					haveMnemonic = true;
+					mnemonic = text.charAt(i);
+					mnemonicIndex = result.length();
+				}
+			}
+			result.append(text.charAt(i));
+		}
+		component.setText(result.toString());
+		if (haveMnemonic) {
+			component.setDisplayedMnemonic(mnemonic);
+			component.setDisplayedMnemonicIndex(mnemonicIndex);
+		}
+	}
+	
+	/**
+	 * @noinspection ALL
+	 */
+	private void $$$loadButtonText$$$(AbstractButton component, String text) {
+		
+		StringBuffer result = new StringBuffer();
+		boolean haveMnemonic = false;
+		char mnemonic = '\0';
+		int mnemonicIndex = -1;
+		for (int i = 0; i < text.length(); i++) {
+			if (text.charAt(i) == '&') {
+				i++;
+				if (i == text.length()) break;
+				if (!haveMnemonic && text.charAt(i) != '&') {
+					haveMnemonic = true;
+					mnemonic = text.charAt(i);
+					mnemonicIndex = result.length();
+				}
+			}
+			result.append(text.charAt(i));
+		}
+		component.setText(result.toString());
+		if (haveMnemonic) {
+			component.setMnemonic(mnemonic);
+			component.setDisplayedMnemonicIndex(mnemonicIndex);
+		}
 	}
 	
 	/**
