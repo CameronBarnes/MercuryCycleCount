@@ -1,3 +1,20 @@
+/*
+ *     Copyright (c) 2022.  Cameron Barnes
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.cameronbarnes.mercury.gui.forms;
 
 import com.cameronbarnes.mercury.core.SavedOngoing;
@@ -58,7 +75,7 @@ public class ResumeForm {
 		
 		mTitle.setText(bundle.getString("resume_form_title"));
 		mResumeButton.setText(bundle.getString("word_resume"));
-		mMainMenuButton.setText(bundle.getString("main_menu_word_caps"));
+		mMainMenuButton.setText(bundle.getString("word_main_menu").toUpperCase());
 		mSummary.setText(bundle.getString("resume_form_summary"));
 		
 	}

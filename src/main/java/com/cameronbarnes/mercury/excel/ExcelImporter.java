@@ -1,3 +1,20 @@
+/*
+ *     Copyright (c) 2022.  Cameron Barnes
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.cameronbarnes.mercury.excel;
 
 import com.cameronbarnes.mercury.stock.Bin;
@@ -5,7 +22,6 @@ import com.cameronbarnes.mercury.stock.Part;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.poi.EmptyFileException;
 import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
-import org.apache.poi.sl.draw.geom.GuideIf;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -14,6 +30,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.regex.MatchResult;
@@ -35,6 +53,16 @@ public final class ExcelImporter {
 		if (!file.exists())
 			return Optional.empty();
 		
+		FileTime time;
+		try {
+			// We're going to get the file creation time, so that we can compare which stockstatus file is more recent if more than one for the same bin is added
+			time = (FileTime) Files.getAttribute(file.toPath(), "CreationTime");
+		} catch (IOException e) {
+			//TODO handle this with the HomeAPI
+			//I'm not sure exactly what causes this error, so I'm going to rethrow it until the home API has it covered so that I can watch for it
+			time = null;
+		}
+		
 		try (FileInputStream fileInputStream = new FileInputStream(file)) {
 			
 			// This throws a NotOfficeXmlFileException if the file isn't actually an Excel file, which we are handling for
@@ -52,7 +80,7 @@ public final class ExcelImporter {
 				return Optional.empty();
 			
 			//All the parts in the bin will have the same Bin Number and Warehouse values, which are the other values we need for the bin object
-			return Optional.of(new Bin(parts.get(0).getBinNum(), parts.get(0).getWarehouse(), parts));
+			return Optional.of(new Bin(parts.get(0).getBinNum(), parts.get(0).getWarehouse(), parts, time));
 		
 		} catch (EmptyFileException e) {
 			
@@ -96,7 +124,7 @@ public final class ExcelImporter {
 				return Optional.empty();
 			
 			//All the parts in the bin will have the same Bin Number and Warehouse values, which are the other values we need for the bin object
-			return Optional.of(new Bin(parts.get(0).getBinNum(), parts.get(0).getWarehouse(), parts));
+			return Optional.of(new Bin(parts.get(0).getBinNum(), parts.get(0).getWarehouse(), parts, time));
 			
 		}
 		

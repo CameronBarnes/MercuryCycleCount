@@ -1,3 +1,20 @@
+/*
+ *     Copyright (c) 2022.  Cameron Barnes
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.cameronbarnes.mercury.util;
 
 import com.cameronbarnes.mercury.core.Main;
@@ -98,7 +115,7 @@ public class SerializationUtilsTest extends TestCase {
 			
 			numParts += 500;
 			List<Part> parts = DebugUtils.generateTestPartList(DebugUtils.generateRandomBinNumber(), RandomStringUtils.random(10, true, true), true, 500);
-			Bin bin = new Bin(parts.get(0).getBinNum(), parts.get(0).getWarehouse(), parts);
+			Bin bin = new Bin(parts.get(0).getBinNum(), parts.get(0).getWarehouse(), parts, null);
 			String serialized = SerializationUtils.serializeBin(bin);
 			Optional<Bin> out = SerializationUtils.deserializeBin(serialized);
 			assertTrue(out.isPresent());

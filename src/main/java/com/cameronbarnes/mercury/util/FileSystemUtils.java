@@ -1,20 +1,38 @@
+/*
+ *     Copyright (c) 2022.  Cameron Barnes
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.cameronbarnes.mercury.util;
 
 import com.cameronbarnes.mercury.core.Main;
 import com.cameronbarnes.mercury.core.Options;
 import com.cameronbarnes.mercury.core.SavedOngoing;
 import com.cameronbarnes.mercury.stock.Bin;
-import org.apache.commons.lang3.RandomStringUtils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class FileSystemUtils {
 	
@@ -27,30 +45,65 @@ public final class FileSystemUtils {
 		
 	}
 	
+	public static String getAllBeforeLastSubstring(String str, String split) {
+		int num = str.lastIndexOf(split);
+		return num == -1 ? str : str.substring(0, num);
+	}
+	
 	public static String getLastSubstring(String str, String split) {
 		int num = str.lastIndexOf(split);
 		return num == -1 ? str : str.substring(++num);
+	}
+	
+	/**
+	 * Safely moves a file or directory from one path to another. Appends a random number to the end of the name if the destination already exists
+	 * @param from The path to the file or directory to copy from
+	 * @param to The path to copy the file or directory to
+	 * @throws FileNotFoundException If the 'from' file does not exist FileNowFoundException is thrown
+	 */
+	public static void moveSafe(String from, String to) throws FileNotFoundException {
+		moveSafe(Path.of(from), Path.of(to));
+	}
+	
+	/**
+	 * Safely moves a file or directory from one path to another. Appends a random number to the end of the name if the destination already exists
+	 * @param from The path to the file or directory to copy from
+	 * @param to The path to copy the file or directory to
+	 * @throws FileNotFoundException If the 'from' file does not exist FileNowFoundException is thrown
+	 */
+	public static void moveSafe(Path from, Path to) throws FileNotFoundException {
+		
+		if (!from.toFile().exists())
+			throw new FileNotFoundException("File to move not found: " + from);
+		
+		while (to.toFile().exists()) { // A while loop should be unnecessary here, but I'll leave it in just in case
+			if (to.toFile().getName().contains(".")) { // If the filename does not contain a '.' then we don't separate by it
+				to = Path.of(FileSystemUtils.getAllBeforeLastSubstring(to.toFile().getName(), ".") +
+						             ThreadLocalRandom.current().nextInt(1000, 9999) +
+						             "." + FileSystemUtils.getLastSubstring(to.toFile().getName(), "."));
+			} else {
+				to = Path.of(to.toFile().getName() + ThreadLocalRandom.current().nextInt(1000, 9999) );
+			}
+		}
+		
+		try {
+			Files.move(from, to);
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e); // TODO handle this with the home API
+			// This shouldn't ever happen, all likely causes should be covered by the previous check cases
+		}
+		
 	}
 	
 	public static void moveAllFromProcessToIngest() {
 		
 		Arrays.stream(Objects.requireNonNull(Options.PROCESS_FOLDER.listFiles())).dropWhile(File::isDirectory).forEach(file -> {
 			try {
-				Path outInIngest = Path.of(Options.IMPORT_FOLDER + File.separator + file.getName());
-				if (outInIngest.toFile().getAbsoluteFile().exists()) {
-					// We're adding a random bit of text to the end of the file name to prevent issues with duplicates
-					String txt = outInIngest.toString();
-					outInIngest = Path.of(
-							txt.substring(0, txt.lastIndexOf(File.separator)) + File.separator
-									+ file.getName().substring(0, file.getName().lastIndexOf("."))
-									+ RandomStringUtils.random(5, true, true)
-									+ "." + getLastSubstring(file.getName(), ".")
-												 );
-				}
-				Files.move(file.toPath(), outInIngest);
+				moveSafe(file.toPath().toString(), Options.IMPORT_FOLDER + File.separator + file.getName());
 			}
-			catch (IOException e) {
-				e.printStackTrace();
+			catch (FileNotFoundException e) {
+				e.printStackTrace(); // TODO handle with home api
 			}
 		});
 	}
@@ -165,6 +218,7 @@ public final class FileSystemUtils {
 		saveOngoing(bins, new File(Options.SAVED_ONGOING_FOLDER.getPath() + File.separator + Date.from(Instant.now()).toString().replace(":", "-")));
 	}
 	
+	@SuppressWarnings("ResultOfMethodCallIgnored")
 	public static void saveOngoing(List<Bin> bins, File outDir) {
 		
 		//Create all the files for dirs we will need
@@ -189,10 +243,18 @@ public final class FileSystemUtils {
 		
 	}
 	
+	/**
+	 * Checks to see if there are any saved sessions. Technically it's only counting the number of files in the folder that's supposed to hold saved sessions
+	 * @return true if we think there is a saved session in the SAVED_ONGOING_FOLDER folder
+	 */
 	public static boolean hasSavedSessions() {
 		return Objects.requireNonNull(Options.SAVED_ONGOING_FOLDER.listFiles()).length > 0;
 	}
 	
+	/**
+	 * Gets a List of SavedOngoing objects from the SAVED_ONGOING_FOLDER folder so that we can list them and allow the user to resume a previous count
+	 * @return A List of all the SavedOngoing sessions from the  SAVED_ONGOING_FOLDER
+	 */
 	public static List<SavedOngoing> getSavedSessions() {
 		
 		ArrayList<SavedOngoing> savedSessions = new ArrayList<>();
@@ -229,7 +291,7 @@ public final class FileSystemUtils {
 		// We'll move all the stockstatus files from the saved data to the process folder
 		Arrays.stream(Objects.requireNonNull(new File(savedOngoing.getSaveDir().getAbsolutePath() + File.separator + "stockstatus").listFiles())).dropWhile(File::isDirectory).forEach(file -> {
 			try {
-				Files.move(file.toPath(), Path.of(Options.PROCESS_FOLDER.getPath() + File.separator + file.getName()));
+				FileSystemUtils.moveSafe(file.toPath(), Path.of(Options.PROCESS_FOLDER.getPath() + File.separator + file.getName()));
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -240,6 +302,12 @@ public final class FileSystemUtils {
 		
 	}
 	
+	/**
+	 * Deletes the directory provided and all the files contained, it throws a RuntimeException if the provided file is not a directory.
+	 * It returns early if the provided file does not exist
+	 * @param dir The directory to delete
+	 * @throws RuntimeException Throws a RuntimeException if the provided file is not a directory
+	 */
 	@SuppressWarnings("ResultOfMethodCallIgnored")
 	public static void deleteDir(File dir) {
 		

@@ -1,3 +1,20 @@
+/*
+ *     Copyright (c) 2022.  Cameron Barnes
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.cameronbarnes.mercury.gui.forms;
 
 import com.cameronbarnes.mercury.core.Options;
@@ -92,6 +109,7 @@ public class IngestForm {
 						
 						if (flavor.isFlavorJavaFileListType()) {
 							//TODO prompt if we want to move these files or copy them
+							//noinspection unchecked
 							mSession.addIngest((List<File>) transferable.getTransferData(flavor));
 							
 						}
@@ -132,7 +150,7 @@ public class IngestForm {
 					else {
 						wareHouse = "301-Good Parts"; // TODO Allow user input for this value later
 					}
-					Bin newBin = new Bin(input, wareHouse, new ArrayList<>());
+					Bin newBin = new Bin(input, wareHouse, new ArrayList<>(), null);
 					((IngestBinTableModel) mIngestBinTable.getModel()).addBin(newBin);
 					((IngestBinTableModel) mIngestBinTable.getModel()).fireTableDataChanged();
 				}
