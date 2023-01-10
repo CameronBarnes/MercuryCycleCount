@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cameronbarnes</groupId>
 	<artifactId>MercuryCycleCount</artifactId>
-	<version>1.2.1-BETA</version>
+	<version>1.2.2-ALPHA</version>
 	<packaging>jar</packaging>
 
 	<properties>

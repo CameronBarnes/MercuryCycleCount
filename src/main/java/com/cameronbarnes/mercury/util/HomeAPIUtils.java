@@ -17,6 +17,8 @@
 
 package com.cameronbarnes.mercury.util;
 
+import com.cameronbarnes.mercury.api.BugFeedbackCall;
+import com.cameronbarnes.mercury.api.HomeAPICall;
 import com.cameronbarnes.mercury.core.Session;
 import com.cameronbarnes.mercury.stock.Bin;
 
@@ -25,13 +27,13 @@ import java.util.List;
 
 public class HomeAPIUtils {
 	
-	public static void sendFeedback(String text) {
+	public static void sendFeedback(String text, Session session) {
 	
 		if (text == null || text.isBlank()) {
 			return;
 		}
 		
-		
+		HomeAPICall apiCall = new BugFeedbackCall(text, session, false);
 	
 	}
 	
@@ -41,9 +43,19 @@ public class HomeAPIUtils {
 	
 	}
 	
+	public static void handleStandardException(Exception e, Session session) {
+	
+	
+	
+	}
+	
 	public static void sendBugReport(String text, Session session) {
-	
-	
+		
+		if (text == null || text.isBlank()) {
+			return;
+		}
+		
+		HomeAPICall apiCall = new BugFeedbackCall(text, session, true);
 	
 	}
 	

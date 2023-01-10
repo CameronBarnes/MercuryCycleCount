@@ -27,7 +27,7 @@ import java.util.ResourceBundle;
 
 public class Main {
 	
-	public static final Version VERSION = new Version(1, 2, 1, ReleaseType.BETA);
+	public static final Version VERSION = new Version(1, 2, 2, ReleaseType.ALPHA);
 	public static final boolean DEBUG = false;
 	
 	public static void main(String[] args) {

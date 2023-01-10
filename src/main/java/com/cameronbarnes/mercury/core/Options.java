@@ -37,13 +37,14 @@ public final class Options implements IUnprotectedOptions {
 	private boolean mShowAllPartsProgress = false;
 	
 	private boolean mIsAllowedAutoAdjustment = true;
+	private boolean mIsAllowedSendAutomaticHomeAPI = true;
 	
 	private transient Font mFont;
-	
 	private int mFontSize = 12;
 	
 	private String mLocale = Locale.getDefault().toString();
 	private transient ResourceBundle mBundle;
+	
 	private final Map<String, Boolean> mShowPartProperties = new TreeMap<>();
 	
 	public Options() {
@@ -52,6 +53,21 @@ public final class Options implements IUnprotectedOptions {
 		ensureAllNewPropertiesArePresent();
 		generateFont();
 		
+	}
+	
+	/**
+	 * @return is the program allowed to send automatic calls to the home api for things like exceptions
+	 */
+	@Override
+	public boolean isAllowedSendAutomaticHomeAPI() {
+		return mIsAllowedSendAutomaticHomeAPI;
+	}
+	
+	/**
+	 * @param allowed Should the program be able to send automatic calls to the home api for things like exceptions
+	 */
+	public void setIsAllowedSendAutomaticHomeAPI(boolean allowed) {
+		mIsAllowedSendAutomaticHomeAPI = allowed;
 	}
 	
 	/**

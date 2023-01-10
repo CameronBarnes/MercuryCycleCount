@@ -57,4 +57,19 @@ public interface IUnprotectedOptions {
 	 */
 	int getFontSize();
 	
+	/**
+	 * @return is the program allowed to send automatic calls to the home api for things like exceptions
+	 */
+	boolean isAllowedSendAutomaticHomeAPI();
+	
+	/**
+	 * @return is the program allowed to send session data to the home api in cases of a bug report
+	 */
+	boolean isAllowedSendSessionDataToHomeAPI();
+	
+	/**
+	 * @return returns the serialized options data
+	 */
+	String getRawOptionsData();
+	
 }
