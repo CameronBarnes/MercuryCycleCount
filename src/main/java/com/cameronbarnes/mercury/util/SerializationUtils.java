@@ -110,7 +110,6 @@ public class SerializationUtils {
 		
 		@Override
 		public Main.Version deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-			
 			JsonObject jsonObject = json.getAsJsonObject();
 			return new Main.Version(jsonObject.get("major").getAsInt(), jsonObject.get("minor").getAsInt(), jsonObject.get("patch").getAsInt(), Main.ReleaseType.valueOf(jsonObject.get("label").getAsString()));
 		}
