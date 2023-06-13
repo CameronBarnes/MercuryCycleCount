@@ -18,7 +18,7 @@
 package com.cameronbarnes.mercury.util;
 
 import com.cameronbarnes.mercury.core.Main;
-import com.cameronbarnes.mercury.core.Options;
+import com.cameronbarnes.mercury.core.options.Options;
 import com.cameronbarnes.mercury.stock.Bin;
 import com.cameronbarnes.mercury.stock.Part;
 import com.google.gson.*;
@@ -52,7 +52,6 @@ public class SerializationUtils {
 	}
 	
 	public static String serializeVersion(Main.Version version) {
-		
 		return new Gson().toJson(version);
 	}
 	

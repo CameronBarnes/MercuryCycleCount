@@ -1,5 +1,5 @@
 /*
- *     Copyright (c) 2022.  Cameron Barnes
+ *     Copyright (c) 2022-2023.  Cameron Barnes
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -15,15 +15,15 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.cameronbarnes.mercury.core;
+package com.cameronbarnes.mercury.core.options;
+
+import com.cameronbarnes.mercury.core.Main;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.TreeMap;
 
 public final class Options implements IUnprotectedOptions {
 	
@@ -44,7 +44,7 @@ public final class Options implements IUnprotectedOptions {
 	
 	private String mLocale = Locale.getDefault().toString();
 	private transient ResourceBundle mBundle;
-	private final Map<String, Boolean> mShowPartProperties = new TreeMap<>();
+	private final PartPropertyOptions mShowPartProperties = new PartPropertyOptions();
 	
 	public Options() {
 		
@@ -62,6 +62,14 @@ public final class Options implements IUnprotectedOptions {
 		return mIsAllowedWritePhysicalQuantity;
 	}
 	
+	public boolean isAllowedSendSessionDataToHomeAPI() {
+		return false;
+	}
+	
+	public String getRawOptionsData() {
+		return null;
+	}
+	
 	/**
 	 * @param allowed true if the user is allowed to edit the expected physical quantity value for a part
 	 */
@@ -70,10 +78,14 @@ public final class Options implements IUnprotectedOptions {
 	}
 	
 	/**
-	 * @return a Map < String, Boolean > containing settings for showing or not showing certain part properties in the count form
+	 * @return a IUnprotectedPartPropertyOptions containing write only settings for showing or not showing certain part properties in the count form
 	 */
 	@Override
-	public Map<String, Boolean> getPartDetailSettings() {
+	public IUnprotectedPartPropertyOptions getUnprotectedPartPropertyOptions() {
+		return mShowPartProperties;
+	}
+	
+	public PartPropertyOptions getPartPropertyOptions() {
 		return mShowPartProperties;
 	}
 	
@@ -101,7 +113,7 @@ public final class Options implements IUnprotectedOptions {
 	 */
 	@Override
 	public boolean isAllowedAutoAdjustment() {
-		return  mIsAllowedAutoAdjustment;
+		return  mIsAllowedAutoAdjustment && mShowPartProperties.physicalQty();
 	}
 	
 	@Override
@@ -117,13 +129,8 @@ public final class Options implements IUnprotectedOptions {
 			return false;
 		}
 		
-		if (mShowPartProperties.size() != opt.mShowPartProperties.size())
+		if (!mShowPartProperties.equals(opt.getPartPropertyOptions()))
 			return false;
-		
-		for (String key: mShowPartProperties.keySet()) {
-			if (!mShowPartProperties.get(key).equals(opt.mShowPartProperties.get(key)))
-				return false;
-		}
 		
 		if (!mLocale.equals(opt.mLocale))
 			return false;
@@ -140,15 +147,6 @@ public final class Options implements IUnprotectedOptions {
 	 * This function makes sure the parts properties settings have values for all the different properties after the options object is read from disk
 	 */
 	public void ensureAllNewPropertiesArePresent() {
-		
-		TreeMap<String, Boolean> expected = new TreeMap<>();
-		expected.put("WareHouse", false);
-		expected.put("Bin", false);
-		expected.put("AllocatedQuantity", false);
-		expected.put("FreeQuantity", false);
-		expected.put("Comments", false);
-		
-		expected.forEach(mShowPartProperties::putIfAbsent);
 		
 		if (mVersion == null)
 			mVersion = Main.VERSION;

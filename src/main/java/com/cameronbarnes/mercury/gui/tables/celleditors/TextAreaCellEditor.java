@@ -17,7 +17,7 @@
 
 package com.cameronbarnes.mercury.gui.tables.celleditors;
 
-import com.cameronbarnes.mercury.core.Options;
+import com.cameronbarnes.mercury.core.options.Options;
 import com.cameronbarnes.mercury.gui.dialogs.TextAreaDialog;
 import com.cameronbarnes.mercury.gui.tables.models.CycleCountTableModel;
 import com.cameronbarnes.mercury.stock.Part;

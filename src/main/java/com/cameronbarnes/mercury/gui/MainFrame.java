@@ -18,8 +18,9 @@
 package com.cameronbarnes.mercury.gui;
 
 import com.cameronbarnes.mercury.core.Main;
-import com.cameronbarnes.mercury.core.Options;
+import com.cameronbarnes.mercury.core.options.Options;
 import com.cameronbarnes.mercury.core.Session;
+import com.cameronbarnes.mercury.core.options.PartPropertyOptions;
 import com.cameronbarnes.mercury.gui.dialogs.DisplayTextPaneDialog;
 import com.cameronbarnes.mercury.gui.dialogs.TextAreaDialog;
 import com.cameronbarnes.mercury.gui.forms.CountForm;
@@ -27,7 +28,6 @@ import com.cameronbarnes.mercury.gui.forms.IngestForm;
 import com.cameronbarnes.mercury.gui.forms.MainMenu;
 import com.cameronbarnes.mercury.gui.forms.ResumeForm;
 import com.cameronbarnes.mercury.util.DebugUtils;
-import com.cameronbarnes.mercury.util.HomeAPIUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -96,7 +96,8 @@ public class MainFrame extends JFrame {
 		JCheckBoxMenuItem allowAutoAdjustment = new JCheckBoxMenuItem(bundle.getString("menu_bar_allow_automatic_adjustment"));
 		allowAutoAdjustment.addActionListener(e -> {
 			options.setAllowedAutoAdjustment(allowAutoAdjustment.isSelected());
-			mCountForm.forceUpdateAdjustment();
+			if (mCountForm != null)
+				mCountForm.forceUpdateAdjustment();
 		});
 		allowAutoAdjustment.setSelected(options.isAllowedAutoAdjustment());
 		
@@ -106,47 +107,73 @@ public class MainFrame extends JFrame {
 		JMenu partDetails = new JMenu();
 		partDetails.setText(bundle.getString("word_part_details"));
 		
+		PartPropertyOptions partPropertyOptions = options.getPartPropertyOptions();
+		
 		JCheckBoxMenuItem warehouse = new JCheckBoxMenuItem("WareHouse");
 		warehouse.addActionListener(e -> {
-			options.getPartDetailSettings().replace("WareHouse", warehouse.getState());
+			partPropertyOptions.setWarehouse(warehouse.isSelected());
 			if (mCountForm != null)
 				mCountForm.changePartsTableLayout();
 		});
-		warehouse.setSelected(options.getPartDetailSettings().get("WareHouse"));
+		warehouse.setSelected(partPropertyOptions.warehouse());
 		JCheckBoxMenuItem bin = new JCheckBoxMenuItem("Bin");
 		bin.addActionListener(e -> {
-			options.getPartDetailSettings().replace("Bin", bin.getState());
+			partPropertyOptions.setBin(bin.isSelected());
 			if (mCountForm != null)
 				mCountForm.changePartsTableLayout();
 		});
-		bin.setSelected(options.getPartDetailSettings().get("Bin"));
+		bin.setSelected(partPropertyOptions.bin());
 		JCheckBoxMenuItem allocated = new JCheckBoxMenuItem("AllocatedQty");
 		allocated.addActionListener(e -> {
-			options.getPartDetailSettings().replace("AllocatedQuantity", allocated.getState());
+			partPropertyOptions.setAllocatedQty(allocated.isSelected());
 			if (mCountForm != null)
 				mCountForm.changePartsTableLayout();
 		});
-		allocated.setSelected(options.getPartDetailSettings().get("AllocatedQuantity"));
+		allocated.setSelected(partPropertyOptions.allocatedQty());
 		JCheckBoxMenuItem free = new JCheckBoxMenuItem("FreeQty");
 		free.addActionListener(e -> {
-			options.getPartDetailSettings().replace("FreeQuantity", free.getState());
+			partPropertyOptions.setFreeQty(free.isSelected());
 			if (mCountForm != null)
 				mCountForm.changePartsTableLayout();
 		});
-		free.setSelected(options.getPartDetailSettings().get("FreeQuantity"));
+		free.setSelected(partPropertyOptions.freeQty());
 		JCheckBoxMenuItem comments = new JCheckBoxMenuItem("Comments");
 		comments.addActionListener(e -> {
-			options.getPartDetailSettings().replace("Comments", comments.isSelected());
+			partPropertyOptions.setComments(comments.isSelected());
 			if (mCountForm != null)
 				mCountForm.changePartsTableLayout();
 		});
-		comments.setSelected(options.getPartDetailSettings().get("Comments"));
+		comments.setSelected(partPropertyOptions.comments());
+		JCheckBoxMenuItem physical = new JCheckBoxMenuItem("Physical Quantity");
+		physical.addActionListener(e -> {
+			partPropertyOptions.setPhysicalQty(physical.isSelected());
+			if (mCountForm != null)
+				mCountForm.changePartsTableLayout();
+		});
+		physical.setSelected(partPropertyOptions.physicalQty());
+		JCheckBoxMenuItem cost = new JCheckBoxMenuItem("Cost");
+		cost.addActionListener(e -> {
+			partPropertyOptions.setCost(cost.isSelected());
+			if (mCountForm != null)
+				mCountForm.changePartsTableLayout();
+		});
+		cost.setSelected(partPropertyOptions.cost());
+		JCheckBoxMenuItem description = new JCheckBoxMenuItem("Description");
+		description.addActionListener(e -> {
+			partPropertyOptions.setPartDescription(description.isSelected());
+			if (mCountForm != null)
+				mCountForm.changePartsTableLayout();
+		});
+		description.setSelected(partPropertyOptions.description());
+		// We're not using description at this time, but we'll probably change that later
 		
 		partDetails.add(warehouse);
 		partDetails.add(bin);
 		partDetails.add(allocated);
 		partDetails.add(free);
 		partDetails.add(comments);
+		partDetails.add(physical);
+		partDetails.add(cost);
 		
 		count.add(partDetails);
 		
@@ -164,7 +191,7 @@ public class MainFrame extends JFrame {
 		suggestion.addActionListener(e -> {
 			TextAreaDialog dialog = TextAreaDialog.createDialog(this, bundle.getString("menu_bar_feature_request_dialog"), true);
 			dialog.setOkButtonText(bundle.getString("word_caps_send"));
-			HomeAPIUtils.sendFeedback(dialog.showAndGetResult());
+			//HomeAPIUtils.sendFeedback(dialog.showAndGetResult()); FIXME
 		});
 		
 		feedback.add(reportBug);

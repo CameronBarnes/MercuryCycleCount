@@ -18,7 +18,7 @@
 package com.cameronbarnes.mercury.util;
 
 import com.cameronbarnes.mercury.core.Main;
-import com.cameronbarnes.mercury.core.Options;
+import com.cameronbarnes.mercury.core.options.Options;
 import com.cameronbarnes.mercury.stock.Bin;
 import com.cameronbarnes.mercury.stock.Part;
 import junit.framework.TestCase;
@@ -39,8 +39,8 @@ public class SerializationUtilsTest extends TestCase {
 		options.setAllowedAutoAdjustment(false);
 		options.setAllowedWritePhysicalQuantity(true);
 		
-		options.getPartDetailSettings().replace("AllocatedQuantity", true);
-		options.getPartDetailSettings().replace("FreeQuantity", true);
+		options.getPartPropertyOptions().setAllocatedQty(true);
+		options.getPartPropertyOptions().setFreeQty(true);
 		options.setFontSize(32);
 		options.setVersion(new Main.Version(12, 3, 52, Main.ReleaseType.ALPHA));
 		

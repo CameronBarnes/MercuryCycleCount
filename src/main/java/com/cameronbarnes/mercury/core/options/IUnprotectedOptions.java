@@ -1,5 +1,5 @@
 /*
- *     Copyright (c) 2022.  Cameron Barnes
+ *     Copyright (c) 2022-2023.  Cameron Barnes
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -15,11 +15,10 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.cameronbarnes.mercury.core;
+package com.cameronbarnes.mercury.core.options;
 
 import java.awt.*;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 public interface IUnprotectedOptions {
@@ -35,7 +34,7 @@ public interface IUnprotectedOptions {
 	/**
 	 * @return a Map<String, Boolean> containing settings for showing or not showing certain part properties in the count form
 	 */
-	Map<String, Boolean> getPartDetailSettings();
+	IUnprotectedPartPropertyOptions getUnprotectedPartPropertyOptions();
 	
 	/**
 	 * @return true for include all parts in all bins in the progress bar, false for only show parts in the current bin

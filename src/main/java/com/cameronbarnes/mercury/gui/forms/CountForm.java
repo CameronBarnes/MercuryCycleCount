@@ -211,7 +211,7 @@ public class CountForm {
 	 * If the layout of the parts table has changed or should change the whole thing needs to be redrawn, this will let the table model know that needs to happen
 	 */
 	public void changePartsTableLayout() {
-		
+		mCycleCountTableModel.updatePartPropertyList();
 		mCycleCountTableModel.fireTableStructureChanged();
 	}
 	

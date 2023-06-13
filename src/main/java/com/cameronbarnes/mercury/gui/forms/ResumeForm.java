@@ -118,8 +118,6 @@ public class ResumeForm {
 		mMainMenuButton = new JButton();
 		this.$$$loadButtonText$$$(mMainMenuButton, this.$$$getMessageFromBundle$$$("labels", "word_main_menu"));
 		mPanel.add(mMainMenuButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-		mSavedSessionsList = new JList();
-		mPanel.add(mSavedSessionsList, new GridConstraints(3, 0, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
 		final Spacer spacer2 = new Spacer();
 		mPanel.add(spacer2, new GridConstraints(3, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
 		mSummary = new JLabel();
@@ -127,6 +125,10 @@ public class ResumeForm {
 		if (mSummaryFont != null) mSummary.setFont(mSummaryFont);
 		this.$$$loadLabelText$$$(mSummary, this.$$$getMessageFromBundle$$$("labels", "resume_menu_instructions"));
 		mPanel.add(mSummary, new GridConstraints(1, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		final JScrollPane scrollPane1 = new JScrollPane();
+		mPanel.add(scrollPane1, new GridConstraints(3, 0, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+		mSavedSessionsList = new JList();
+		scrollPane1.setViewportView(mSavedSessionsList);
 	}
 	
 	/**

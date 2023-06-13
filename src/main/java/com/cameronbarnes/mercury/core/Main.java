@@ -17,6 +17,7 @@
 
 package com.cameronbarnes.mercury.core;
 
+import com.cameronbarnes.mercury.core.options.Options;
 import com.cameronbarnes.mercury.gui.MainFrame;
 import com.cameronbarnes.mercury.util.FileSystemUtils;
 

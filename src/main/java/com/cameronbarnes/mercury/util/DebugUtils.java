@@ -17,7 +17,7 @@
 
 package com.cameronbarnes.mercury.util;
 
-import com.cameronbarnes.mercury.core.Options;
+import com.cameronbarnes.mercury.core.options.Options;
 import com.cameronbarnes.mercury.stock.Bin;
 import com.cameronbarnes.mercury.stock.Part;
 import org.apache.commons.lang3.RandomStringUtils;

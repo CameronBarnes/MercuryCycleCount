@@ -17,25 +17,53 @@
 
 package com.cameronbarnes.mercury.gui.tables.models;
 
-import com.cameronbarnes.mercury.core.IUnprotectedOptions;
+import com.cameronbarnes.mercury.core.options.IUnprotectedOptions;
+import com.cameronbarnes.mercury.core.options.IUnprotectedPartPropertyOptions;
 import com.cameronbarnes.mercury.stock.Part;
 
 import javax.swing.table.AbstractTableModel;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class CycleCountTableModel extends AbstractTableModel {
 	
 	private final List<Part> mParts;
 	private final IUnprotectedOptions mOptions;
 	private final Runnable mUpdateRunnable;
+	private final ArrayList<Part.PartProperty> mPartPropertyList = new ArrayList<>();
 	
 	public CycleCountTableModel(List<Part> parts, IUnprotectedOptions options, Runnable update) {
 		super();
 		mParts = parts;
 		mOptions = options;
 		mUpdateRunnable = update;
+		updatePartPropertyList();
+	}
+	
+	public void updatePartPropertyList() {
+		
+		IUnprotectedPartPropertyOptions properties = mOptions.getUnprotectedPartPropertyOptions();
+		mPartPropertyList.clear();
+		
+		mPartPropertyList.add(Part.PartProperty.PART_NUMBER);
+		mPartPropertyList.add(Part.PartProperty.PART_DESCRIPTION);
+		if (properties.warehouse())
+			mPartPropertyList.add(Part.PartProperty.WAREHOUSE);
+		if (properties.bin())
+			mPartPropertyList.add(Part.PartProperty.BIN);
+		if (properties.allocatedQty())
+			mPartPropertyList.add(Part.PartProperty.ALLOCATED_QUANTITY);
+		if (properties.freeQty())
+			mPartPropertyList.add(Part.PartProperty.FREE_QUANTITY);
+		if (properties.physicalQty())
+			mPartPropertyList.add(Part.PartProperty.PHYSICAL_QUANTITY);
+		mPartPropertyList.add(Part.PartProperty.COUNTED_QUANTITY);
+		mPartPropertyList.add(Part.PartProperty.ADJUSTMENT);
+		if (properties.cost())
+			mPartPropertyList.add(Part.PartProperty.COST);
+		if (properties.comments())
+			mPartPropertyList.add(Part.PartProperty.COMMENTS);
+		
 	}
 	
 	@Override
@@ -45,86 +73,16 @@ public class CycleCountTableModel extends AbstractTableModel {
 	
 	@Override
 	public int getColumnCount() {
-		Map<String, Boolean> properties = mOptions.getPartDetailSettings();
-		int numRows = 6; // This is how many we're definitely going to show, PN, Description, PhysicalQty, CountedQty, Cost, and Adjustment values
-		if (properties.get("WareHouse"))
-			numRows++;
-		if (properties.get("Bin"))
-			numRows++;
-		if (properties.get("AllocatedQuantity"))
-			numRows++;
-		if (properties.get("FreeQuantity"))
-			numRows++;
-		if (properties.get("Comments"))
-			numRows++;
-		
-		return numRows;
+		return mPartPropertyList.size();
 	}
 	
 	private Part.PartProperty getPartPropertyAtColumnIndex(int index) {
-		
-		Map<String, Boolean> properties = mOptions.getPartDetailSettings();
-		boolean warehouse = properties.get("WareHouse");
-		boolean bin = properties.get("Bin");
-		boolean allocatedQty = properties.get("AllocatedQuantity");
-		boolean freeQty = properties.get("FreeQuantity");
-		boolean comments = properties.get("Comments");
-		
-		LinkedList<Part.PartProperty> out = new LinkedList<>();
-		out.add(Part.PartProperty.PART_NUMBER);
-		out.add(Part.PartProperty.PART_DESCRIPTION);
-		if (warehouse)
-			out.add(Part.PartProperty.WAREHOUSE);
-		if (bin)
-			out.add(Part.PartProperty.BIN);
-		out.add(Part.PartProperty.PHYSICAL_QUANTITY);
-		if (allocatedQty)
-			out.add(Part.PartProperty.ALLOCATED_QUANTITY);
-		if (freeQty)
-			out.add(Part.PartProperty.FREE_QUANTITY);
-		out.add(Part.PartProperty.COUNTED_QUANTITY);
-		out.add(Part.PartProperty.COST);
-		out.add(Part.PartProperty.ADJUSTMENT);
-		if (comments)
-			out.add(Part.PartProperty.COMMENTS);
-		
-		return out.get(index);
-		
+		return mPartPropertyList.get(index);
 	}
 	
 	public int getColumnIndexAtProperty(Part.PartProperty property) {
 		
-		Map<String, Boolean> properties = mOptions.getPartDetailSettings();
-		boolean warehouse = properties.get("WareHouse");
-		boolean bin = properties.get("Bin");
-		boolean allocatedQty = properties.get("AllocatedQuantity");
-		boolean freeQty = properties.get("FreeQuantity");
-		boolean comments = properties.get("Comments");
-		
-		LinkedList<Part.PartProperty> out = new LinkedList<>();
-		out.add(Part.PartProperty.PART_NUMBER);
-		out.add(Part.PartProperty.PART_DESCRIPTION);
-		if (warehouse)
-			out.add(Part.PartProperty.WAREHOUSE);
-		if (bin)
-			out.add(Part.PartProperty.BIN);
-		out.add(Part.PartProperty.PHYSICAL_QUANTITY);
-		if (allocatedQty)
-			out.add(Part.PartProperty.ALLOCATED_QUANTITY);
-		if (freeQty)
-			out.add(Part.PartProperty.FREE_QUANTITY);
-		out.add(Part.PartProperty.COUNTED_QUANTITY);
-		out.add(Part.PartProperty.COST);
-		out.add(Part.PartProperty.ADJUSTMENT);
-		if (comments)
-			out.add(Part.PartProperty.COMMENTS);
-		
-		for (int i = 0; i < out.size(); i++) {
-			if (out.get(i) == property)
-				return i;
-		}
-		
-		return -1;
+		return mPartPropertyList.lastIndexOf(property);
 		
 	}
 	

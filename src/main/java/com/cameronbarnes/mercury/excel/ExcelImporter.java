@@ -31,6 +31,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -56,7 +57,8 @@ public final class ExcelImporter {
 		FileTime time;
 		try {
 			// We're going to get the file creation time, so that we can compare which stockstatus file is more recent if more than one for the same bin is added
-			time = (FileTime) Files.getAttribute(file.toPath(), "CreationTime");
+			BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+			time = attr.creationTime();
 		} catch (IOException e) {
 			//TODO handle this with the HomeAPI
 			//I'm not sure exactly what causes this error, so I'm going to rethrow it until the home API has it covered so that I can watch for it

@@ -17,7 +17,7 @@
 
 package com.cameronbarnes.mercury.stock;
 
-import com.cameronbarnes.mercury.core.IUnprotectedOptions;
+import com.cameronbarnes.mercury.core.options.IUnprotectedOptions;
 
 public class Part {
 	

@@ -17,7 +17,7 @@
 
 package com.cameronbarnes.mercury.gui.forms;
 
-import com.cameronbarnes.mercury.core.Options;
+import com.cameronbarnes.mercury.core.options.Options;
 import com.cameronbarnes.mercury.core.Session;
 import com.cameronbarnes.mercury.gui.tables.models.IngestBinTableModel;
 import com.cameronbarnes.mercury.stock.Bin;
