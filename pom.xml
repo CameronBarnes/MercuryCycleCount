@@ -50,10 +50,16 @@
 			<artifactId>poi</artifactId>
 			<version>5.2.2</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
+		<dependency> <!-- We're manually including this dependency to resolve an issue with the dependency bellow using a vulnerable version -->
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.26.2</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>5.2.2</version>
+			<version>5.2.5</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
 		<dependency>
@@ -62,25 +68,15 @@
 			<version>1.10.0</version>
 		</dependency>
 		<dependency>
-			<groupId>com.intellij</groupId>
-			<artifactId>forms_rt</artifactId>
-			<version>7.0.3</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/ideauidesigner-maven-plugin -->
-		<dependency>
-			<groupId>org.codehaus.mojo</groupId>
-			<artifactId>ideauidesigner-maven-plugin</artifactId>
-			<version>1.0-beta-1</version>
-		</dependency>
-		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>2.10</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter</artifactId>
-			<version>5.9.0</version>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>5.11.0-M2</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

@@ -20,7 +20,6 @@ package com.cameronbarnes.mercury.util;
 import com.cameronbarnes.mercury.core.Options;
 import com.cameronbarnes.mercury.core.SavedOngoing;
 import com.cameronbarnes.mercury.stock.Bin;
-import junit.framework.TestCase;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -29,7 +28,9 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
-public class FileSystemUtilsTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class FileSystemUtilsTest {
 	
 	@Test
 	public void testReadWriteSaveSession() {

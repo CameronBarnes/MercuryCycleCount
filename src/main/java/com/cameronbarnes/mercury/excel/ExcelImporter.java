@@ -37,6 +37,7 @@ import java.util.Optional;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.ZipException;
 
 public final class ExcelImporter {
 	
@@ -56,7 +57,7 @@ public final class ExcelImporter {
 		FileTime time;
 		try {
 			// We're going to get the file creation time, so that we can compare which stockstatus file is more recent if more than one for the same bin is added
-			time = (FileTime) Files.getAttribute(file.toPath(), "CreationTime");
+			time = (FileTime) Files.getAttribute(file.toPath(), "creationTime");
 		} catch (IOException e) {
 			//TODO handle this with the HomeAPI
 			//I'm not sure exactly what causes this error, so I'm going to rethrow it until the home API has it covered so that I can watch for it
@@ -88,17 +89,15 @@ public final class ExcelImporter {
 			file.delete();
 			return Optional.empty();
 			
-		} catch (IOException e) { //TODO handle this with the HomeAPI
-			System.err.println("Debug: Exception in Excel Bin Importer. Exception text is as follows");
-			e.printStackTrace();
-			return Optional.empty();
-		} catch (NotOfficeXmlFileException e) {
-			//sneaky HTMobbitses
-			// So apparently CSS8 outputs an HTML file instead of a xls file, but still calls it a xls file, and Excel will read it as a xls file, but Apache POI will not
-			// So we're going to have to work some regex magic to make this data useful
-			// I should probably be checking for this rather than just catching it as an exception, but this seems to be the least messy way to do this
-			
-			ArrayList<Part> parts = new ArrayList<>();
+		} catch (NotOfficeXmlFileException | ZipException e) {
+			/*
+			sneaky HTMobbitses
+			 So apparently CSS8 outputs an HTML file instead of a xls file, but still calls it a xls file, and Excel will read it as a xls file, but Apache POI will not
+			 So we're going to have to work some regex magic to make this data useful
+			 I should probably be checking for this rather than just catching it as an exception, but this seems to be the least messy way to do this
+			*/
+
+            ArrayList<Part> parts = new ArrayList<>();
 			
 			// The charset for this file is VERY weird, it took me hours to figure this out and this try with resources looks like crap, but it works
 			try (BufferedReader reader = new BufferedReader(new InputStreamReader(new BOMInputStream(new FileInputStream(file), false), StandardCharsets.UTF_16LE))) {
@@ -126,6 +125,10 @@ public final class ExcelImporter {
 			//All the parts in the bin will have the same Bin Number and Warehouse values, which are the other values we need for the bin object
 			return Optional.of(new Bin(parts.get(0).getBinNum(), parts.get(0).getWarehouse(), parts, time));
 			
+		} catch (IOException e) { //TODO handle this with the HomeAPI
+			System.err.println("Debug: Exception in Excel Bin Importer. Exception text is as follows");
+			e.printStackTrace();
+			return Optional.empty();
 		}
 		
 	}
