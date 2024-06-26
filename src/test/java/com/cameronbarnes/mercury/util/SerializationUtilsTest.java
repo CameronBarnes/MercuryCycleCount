@@ -21,7 +21,6 @@ import com.cameronbarnes.mercury.core.Main;
 import com.cameronbarnes.mercury.core.Options;
 import com.cameronbarnes.mercury.stock.Bin;
 import com.cameronbarnes.mercury.stock.Part;
-import junit.framework.TestCase;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class SerializationUtilsTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class SerializationUtilsTest {
 	
 	@Test
 	public void testOptionsSerialization() {

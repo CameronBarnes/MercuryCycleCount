@@ -18,10 +18,11 @@
 package com.cameronbarnes.mercury.util;
 
 import com.cameronbarnes.mercury.gui.forms.CountForm;
-import junit.framework.TestCase;
 import org.junit.jupiter.api.Test;
 
-public class DebugUtilsTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class DebugUtilsTest {
 	
 	@Test
 	public void testGenerateRandomPartNumber() {

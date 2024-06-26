@@ -17,10 +17,11 @@
 
 package com.cameronbarnes.mercury.core;
 
-import junit.framework.TestCase;
 import org.junit.jupiter.api.Test;
 
-public class MainTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+public class MainTest {
 	
 	@Test
 	public void testDebug() {
